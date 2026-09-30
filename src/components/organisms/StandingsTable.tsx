@@ -2,14 +2,19 @@ import { Link } from 'react-router-dom'
 import type { StandingRow } from '@/types/api'
 import { TeamBadge } from '@/components/molecules/TeamBadge'
 
-/** Tabla de posiciones (RF-12). Reutilizable en público y admin. */
+/** Tabla de posiciones (RF-12). Reutilizable en público y admin.
+ *  Con `tournamentId`, cada equipo enlaza a su perfil dentro del torneo. */
 export function StandingsTable({
   rows,
   topZone = 4,
+  tournamentId,
 }: {
   rows: StandingRow[]
   topZone?: number
+  tournamentId?: string
 }) {
+  const teamHref = (teamId: string) =>
+    tournamentId ? `/torneos/${tournamentId}/equipos/${teamId}` : undefined
   return (
     <>
       <div className="table-wrap">
@@ -34,9 +39,13 @@ export function StandingsTable({
                   <span className="pos">{r.position}</span>
                 </td>
                 <td>
-                  <Link to={`/equipos/${r.team.id}`}>
+                  {teamHref(r.team.id) ? (
+                    <Link to={teamHref(r.team.id)!}>
+                      <TeamBadge name={r.team.name} logoUrl={r.team.logo_url} />
+                    </Link>
+                  ) : (
                     <TeamBadge name={r.team.name} logoUrl={r.team.logo_url} />
-                  </Link>
+                  )}
                 </td>
                 <td className="num">{r.played}</td>
                 <td className="num">{r.won}</td>
@@ -61,7 +70,7 @@ export function StandingsTable({
         </table>
       </div>
       <p className="table__note">
-        Orden: puntos → diferencia → puntos a favor → menos puntos en contra.
+        Orden: puntos → puntos a favor → diferencia → menos puntos en contra.
         {rows.some((r) => r.adjustment_points !== 0) && ' * Incluye ajuste manual de puntos.'}
       </p>
     </>

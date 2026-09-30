@@ -32,9 +32,9 @@ export function AdminTournamentsPage() {
 
   const onDelete = (t: Tournament) => {
     const ok = window.confirm(
-      `¿Eliminar "${t.name}"?\n\nEsto borra en cascada equipos, jugadores, jornadas, ` +
-        `partidos, estadísticas y finanzas del torneo. Considera cambiar el estado ` +
-        `a "Cancelado" o "Finalizado" en su lugar.`,
+      `¿Eliminar "${t.name}"?\n\nEsto borra en cascada las inscripciones, jornadas, ` +
+        `partidos, estadísticas y finanzas del torneo. Los clubes y sus jugadores se ` +
+        `conservan. Considera cambiar el estado a "Cancelado" o "Finalizado" en su lugar.`,
     )
     if (!ok) return
     del.mutate(t.id, {

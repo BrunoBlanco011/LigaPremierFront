@@ -16,19 +16,19 @@ interface FormValues {
   jersey_number: string
 }
 
-/** Alta y edición de jugador (RF-41). */
+/** Alta y edición de jugador (RF-41). La plantilla es del club. */
 export function PlayerForm({
-  teamId,
+  clubId,
   player,
   onClose,
 }: {
-  teamId: string
+  clubId: string
   player?: Player
   onClose: () => void
 }) {
   const isEdit = Boolean(player)
-  const create = useCreatePlayer(teamId)
-  const update = useUpdatePlayer(teamId)
+  const create = useCreatePlayer(clubId)
+  const update = useUpdatePlayer(clubId)
   const [formError, setFormError] = useState<string | null>(null)
 
   const {

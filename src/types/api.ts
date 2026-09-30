@@ -38,18 +38,29 @@ export interface Tournament {
   points_loss: number
 }
 
-export interface Team {
+/** Club: equipo permanente de la liga; conserva plantilla e historial. */
+export interface Club {
   id: UUID
-  tournament_id: UUID
   name: string
   coach_name: string | null
   coach_user_id: UUID | null
   logo_url: string | null
 }
 
+/** Team: inscripción de un club a un torneo (a él se ligan tabla, partidos, finanzas). */
+export interface Team {
+  id: UUID
+  tournament_id: UUID
+  club_id: UUID
+  name: string
+  coach_name: string | null
+  logo_url: string | null
+}
+
+/** Jugador: pertenece a un club y se conserva entre torneos. */
 export interface Player {
   id: UUID
-  team_id: UUID
+  club_id: UUID
   full_name: string
   jersey_number: number | null
   is_active: boolean
@@ -111,6 +122,20 @@ export interface PlayerStatTotals extends Omit<PlayerStat, 'attended'> {
 export interface PlayerStatLeader extends PlayerStatTotals {
   player: Pick<Player, 'id' | 'full_name' | 'jersey_number'>
   team: Pick<Team, 'id' | 'name' | 'logo_url'>
+}
+
+/** Totales de un jugador en un torneo concreto (carrera, RF-19). */
+export interface PlayerStatByTournament extends PlayerStatTotals {
+  tournament: Pick<Tournament, 'id' | 'name' | 'season'>
+  team_id: UUID
+}
+
+/** Un renglón del historial de un club (RF-17b). */
+export interface ClubHistoryRow {
+  tournament: Pick<Tournament, 'id' | 'name' | 'season'>
+  team_id: UUID
+  standing: Pick<StandingRow, 'position' | 'won' | 'lost' | 'points'>
+  teams_count: number
 }
 
 export interface FinanceSummaryRow {
