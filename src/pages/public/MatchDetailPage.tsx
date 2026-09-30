@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom'
 import { useMemo } from 'react'
 import type { Player, PlayerStat } from '@/types/api'
 import { useMatch, useMatchStats } from '@/features/matches/queries'
-import { useTeam, useTeamPlayers } from '@/features/teams/queries'
+import { useTeamPlayers } from '@/features/teams/queries'
 import { MatchCard } from '@/components/organisms/MatchCard'
 import {
   EmptyState,
@@ -75,8 +75,7 @@ export function MatchDetailPage() {
   const { mid = '' } = useParams()
   const match = useMatch(mid)
   const stats = useMatchStats(mid)
-  const home = useTeam(match.data?.home_team_id ?? '')
-  const away = useTeam(match.data?.away_team_id ?? '')
+  // El partido (MatchView) ya trae los equipos embebidos; solo pedimos las plantillas.
   const homePlayers = useTeamPlayers(match.data?.home_team_id ?? '')
   const awayPlayers = useTeamPlayers(match.data?.away_team_id ?? '')
 
@@ -93,14 +92,16 @@ export function MatchDetailPage() {
       </div>
     )
 
+  const { home_team, away_team } = match.data
+
   return (
     <div className="container page">
       <p className="eyebrow">Detalle de partido</p>
       <div style={{ maxWidth: 560, marginBottom: 32 }}>
         <MatchCard
           match={match.data}
-          home={home.data ?? undefined}
-          away={away.data ?? undefined}
+          home={home_team ?? undefined}
+          away={away_team ?? undefined}
         />
       </div>
 
@@ -114,12 +115,12 @@ export function MatchDetailPage() {
       ) : (
         <div className="grid grid--2">
           <TeamStats
-            title={home.data?.name ?? 'Local'}
+            title={home_team?.name ?? 'Local'}
             players={homePlayers.data ?? []}
             statsByPlayer={statsByPlayer}
           />
           <TeamStats
-            title={away.data?.name ?? 'Visitante'}
+            title={away_team?.name ?? 'Visitante'}
             players={awayPlayers.data ?? []}
             statsByPlayer={statsByPlayer}
           />

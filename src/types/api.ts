@@ -88,7 +88,12 @@ export interface Match {
   home_score: number | null
   away_score: number | null
   winner_team_id: UUID | null
+  forfeit_loser_team_id: UUID | null
   notes: string | null
+  // El backend responde `MatchView`: incluye los equipos y la jornada embebidos.
+  home_team?: Pick<Team, 'id' | 'name' | 'logo_url'> | null
+  away_team?: Pick<Team, 'id' | 'name' | 'logo_url'> | null
+  round?: { id: UUID; number: number; name: string | null } | null
 }
 
 export interface StandingRow {
@@ -123,29 +128,40 @@ export interface PlayerStat {
   tackles: number
 }
 
-export interface PlayerStatTotals extends Omit<PlayerStat, 'attended'> {
+/**
+ * Acumulado de un jugador, forma **plana** del backend (`PlayerTotalsView`).
+ * Se usa tanto para líderes (RF-18) como para los totales de carrera (RF-19).
+ */
+export interface PlayerTotals {
+  player_id: UUID
+  full_name: string
+  jersey_number: number | null
+  team_id: UUID | null
+  team_name: string
   games_attended: number
+  touchdowns: number
+  td_passes: number
+  interceptions: number
+  sacks: number
+  tackles: number
 }
 
-export interface PlayerStatLeader extends PlayerStatTotals {
-  player: Pick<Player, 'id' | 'full_name' | 'jersey_number'>
-  team: Pick<Team, 'id' | 'name' | 'logo_url'>
+/** Totales de un jugador en un torneo concreto (carrera, RF-19 · `PlayerSeasonView`). */
+export interface PlayerSeason {
+  tournament_id: UUID
+  tournament_name: string
+  totals: PlayerTotals
 }
 
-/** Totales de un jugador en un torneo concreto (carrera, RF-19). */
-export interface PlayerStatByTournament extends PlayerStatTotals {
-  tournament: Pick<Tournament, 'id' | 'name' | 'season'>
-  team_id: UUID
-}
-
-/** Un renglón del historial de un club (RF-17b). */
+/** Un renglón del historial de un club (RF-17b · `ClubSeason`). `standing` puede ser null. */
 export interface ClubHistoryRow {
   tournament: Pick<Tournament, 'id' | 'name' | 'season'>
   team_id: UUID
-  standing: Pick<StandingRow, 'position' | 'won' | 'lost' | 'points'>
+  standing: Pick<StandingRow, 'position' | 'won' | 'lost' | 'points'> | null
   teams_count: number
 }
 
+/** Fila del estado de cuenta (`TeamBalanceView`). Montos como texto. */
 export interface FinanceSummaryRow {
   team: Pick<Team, 'id' | 'name' | 'logo_url'>
   registration_fees: string
@@ -157,7 +173,7 @@ export interface FinanceSummaryRow {
 }
 
 export interface FinanceSummary {
-  rows: FinanceSummaryRow[]
+  teams: FinanceSummaryRow[]
   total_charges: string
   total_payments: string
   total_balance: string

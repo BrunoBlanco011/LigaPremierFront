@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
-import type { PlayerStatLeader } from '@/types/api'
+import type { PlayerTotals } from '@/types/api'
 
 export type LeaderSort =
   | 'touchdowns'
@@ -27,7 +27,7 @@ export function useLeaders(
   return useQuery({
     queryKey: ['tournaments', tournamentId, 'leaders', sortBy, limit],
     queryFn: () =>
-      api.get<PlayerStatLeader[]>(
+      api.get<PlayerTotals[]>(
         `/tournaments/${tournamentId}/player-stats`,
         { query: { sort_by: sortBy, limit } },
       ),

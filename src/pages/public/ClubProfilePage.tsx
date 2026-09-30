@@ -68,14 +68,16 @@ export function ClubProfilePage() {
                     <Link to={`/torneos/${h.tournament.id}`} style={{ fontWeight: 600 }}>
                       {h.tournament.name}
                     </Link>
-                    <span style={{ color: 'var(--ink-faint)' }}>
-                      {' '}· {h.standing.position}.º de {h.teams_count}
-                    </span>
+                    {h.standing && (
+                      <span style={{ color: 'var(--ink-faint)' }}>
+                        {' '}· {h.standing.position}.º de {h.teams_count}
+                      </span>
+                    )}
                   </td>
-                  <td className="num">{h.standing.position}</td>
-                  <td className="num">{h.standing.won}</td>
-                  <td className="num">{h.standing.lost}</td>
-                  <td className="num pts">{h.standing.points}</td>
+                  <td className="num">{h.standing?.position ?? '—'}</td>
+                  <td className="num">{h.standing?.won ?? '—'}</td>
+                  <td className="num">{h.standing?.lost ?? '—'}</td>
+                  <td className="num pts">{h.standing?.points ?? '—'}</td>
                 </tr>
               ))}
             </tbody>

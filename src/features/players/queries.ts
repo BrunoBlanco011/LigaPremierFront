@@ -1,15 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
-import type {
-  Player,
-  PlayerStat,
-  PlayerStatByTournament,
-  PlayerStatTotals,
-} from '@/types/api'
+import type { Player, PlayerStat, PlayerSeason, PlayerTotals } from '@/types/api'
 
 interface PlayerStatsResponse {
-  totals: PlayerStatTotals
-  by_tournament: PlayerStatByTournament[]
+  totals: PlayerTotals
+  by_tournament: PlayerSeason[]
   matches: (PlayerStat & { match_id: string })[]
 }
 

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
+import type { PlayerTotals } from '@/types/api'
 import type { TournamentContext } from '../TournamentPage'
 import {
   LEADER_LABELS,
@@ -22,10 +23,7 @@ const CATEGORIES: LeaderSort[] = [
   'games_attended',
 ]
 
-const valueOf = (
-  row: { touchdowns: number; td_passes: number; interceptions: number; sacks: number; tackles: number; games_attended: number },
-  sort: LeaderSort,
-) => row[sort]
+const valueOf = (row: PlayerTotals, sort: LeaderSort) => row[sort]
 
 export function StatsTab() {
   const { tournamentId } = useOutletContext<TournamentContext>()
@@ -65,22 +63,22 @@ export function StatsTab() {
             </thead>
             <tbody>
               {leaders.data.map((row, i) => (
-                <tr key={row.player.id}>
+                <tr key={row.player_id}>
                   <td>
                     <span className="pos">{i + 1}</span>
                   </td>
                   <td>
-                    <Link to={`/jugadores/${row.player.id}`}>
-                      {row.player.jersey_number != null && (
+                    <Link to={`/jugadores/${row.player_id}`}>
+                      {row.jersey_number != null && (
                         <b style={{ color: 'var(--ink-faint)', marginRight: 8 }}>
-                          #{row.player.jersey_number}
+                          #{row.jersey_number}
                         </b>
                       )}
-                      {row.player.full_name}
+                      {row.full_name}
                     </Link>
                   </td>
                   <td>
-                    <TeamBadge name={row.team.name} logoUrl={row.team.logo_url} />
+                    <TeamBadge name={row.team_name} logoUrl={null} />
                   </td>
                   <td className="num pts">{valueOf(row, sort)}</td>
                 </tr>

@@ -87,7 +87,7 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
         <LoadingState />
       ) : summary.isError ? (
         <ErrorState error={summary.error} onRetry={() => summary.refetch()} />
-      ) : !summary.data || summary.data.rows.length === 0 ? (
+      ) : !summary.data || summary.data.teams.length === 0 ? (
         <EmptyState title="Sin datos financieros" message="Carga la inscripción para empezar." />
       ) : (
         <div className="table-wrap">
@@ -104,7 +104,7 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
               </tr>
             </thead>
             <tbody>
-              {summary.data.rows.map((r) => (
+              {summary.data.teams.map((r) => (
                 <tr key={r.team.id}>
                   <td><TeamBadge name={r.team.name} logoUrl={r.team.logo_url} /></td>
                   <td className="num"><MoneyText amount={r.registration_fees} /></td>

@@ -65,18 +65,18 @@ export function PlayerProfilePage() {
               </thead>
               <tbody>
                 {stats.data.by_tournament.map((bt) => (
-                  <tr key={bt.tournament.id}>
+                  <tr key={bt.tournament_id}>
                     <td>
-                      <Link to={`/torneos/${bt.tournament.id}`} style={{ fontWeight: 600 }}>
-                        {bt.tournament.name}
+                      <Link to={`/torneos/${bt.tournament_id}`} style={{ fontWeight: 600 }}>
+                        {bt.tournament_name}
                       </Link>
                     </td>
-                    <td className="num">{bt.games_attended}</td>
-                    <td className="num">{bt.touchdowns}</td>
-                    <td className="num">{bt.td_passes}</td>
-                    <td className="num">{bt.interceptions}</td>
-                    <td className="num">{bt.sacks}</td>
-                    <td className="num">{bt.tackles}</td>
+                    <td className="num">{bt.totals.games_attended}</td>
+                    <td className="num">{bt.totals.touchdowns}</td>
+                    <td className="num">{bt.totals.td_passes}</td>
+                    <td className="num">{bt.totals.interceptions}</td>
+                    <td className="num">{bt.totals.sacks}</td>
+                    <td className="num">{bt.totals.tackles}</td>
                   </tr>
                 ))}
               </tbody>

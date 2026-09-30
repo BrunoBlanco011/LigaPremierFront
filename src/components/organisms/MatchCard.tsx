@@ -26,6 +26,9 @@ export function MatchCard({
   const played = match.status === 'finished' || match.status === 'forfeit'
   const homeWon = match.winner_team_id === match.home_team_id
   const awayWon = match.winner_team_id === match.away_team_id
+  // El caller puede pasar los equipos, o se toman los embebidos en MatchView.
+  const homeTeam = home ?? match.home_team ?? undefined
+  const awayTeam = away ?? match.away_team ?? undefined
 
   const body = (
     <div className="card match">
@@ -35,7 +38,7 @@ export function MatchCard({
       </div>
       <div className="match__body">
         <div className="match__side">
-          <TeamName team={home} />
+          <TeamName team={homeTeam} />
         </div>
         {played ? (
           <span className="match__score tnum">
@@ -49,7 +52,7 @@ export function MatchCard({
           </span>
         )}
         <div className="match__side match__side--away">
-          <TeamName team={away} />
+          <TeamName team={awayTeam} />
         </div>
       </div>
       <div className="match__foot">
