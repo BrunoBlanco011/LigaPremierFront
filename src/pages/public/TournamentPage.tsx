@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import type { Team } from '@/types/api'
 import { useTournament } from '@/features/tournaments/queries'
 import { useTournamentTeams } from '@/features/teams/queries'
+import { indexById } from '@/lib/collections'
 import { TabNav } from '@/components/organisms/TabNav'
 import type { TabItem } from '@/components/organisms/TabNav'
 import { TournamentStatusPill } from '@/components/molecules/StatusPill'
@@ -18,10 +19,7 @@ export function TournamentPage() {
   const tournament = useTournament(id)
   const teams = useTournamentTeams(id)
 
-  const teamsById = useMemo(
-    () => new Map((teams.data ?? []).map((t) => [t.id, t])),
-    [teams.data],
-  )
+  const teamsById = useMemo(() => indexById(teams.data), [teams.data])
 
   const base = `/torneos/${id}`
   const tabs: TabItem[] = [

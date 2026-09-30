@@ -7,6 +7,7 @@ import {
   useTournamentTeams,
 } from '@/features/teams/queries'
 import { useMatches } from '@/features/schedule/queries'
+import { indexById } from '@/lib/collections'
 import { MatchCard } from '@/components/organisms/MatchCard'
 import { TeamBadge } from '@/components/molecules/TeamBadge'
 import {
@@ -22,10 +23,7 @@ export function TournamentTeamPage() {
   const players = useTeamPlayers(teamId)
   const matches = useMatches(id, { teamId })
   const allTeams = useTournamentTeams(id)
-  const teamsById = useMemo(
-    () => new Map((allTeams.data ?? []).map((t) => [t.id, t])),
-    [allTeams.data],
-  )
+  const teamsById = useMemo(() => indexById(allTeams.data), [allTeams.data])
 
   if (team.isLoading) return <div className="container page"><LoadingState /></div>
   if (team.isError || !team.data)

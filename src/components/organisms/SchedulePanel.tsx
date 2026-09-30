@@ -10,7 +10,8 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
-import { friendlyMessage } from '@/lib/errors'
+import { confirmAndMutate } from '@/lib/mutationHelpers'
+import { indexById } from '@/lib/collections'
 import { formatDate } from '@/lib/format'
 
 /** Rol de juegos en admin: generar + listar/eliminar jornadas (RF-23/24). */
@@ -21,10 +22,7 @@ export function SchedulePanel({ tournamentId }: { tournamentId: string }) {
   const delRound = useDeleteRound(tournamentId)
   const [genOpen, setGenOpen] = useState(false)
 
-  const teamsById = useMemo(
-    () => new Map((teams.data ?? []).map((t) => [t.id, t])),
-    [teams.data],
-  )
+  const teamsById = useMemo(() => indexById(teams.data), [teams.data])
   const matchCountByRound = useMemo(() => {
     const m = new Map<string, number>()
     for (const match of matches.data ?? []) {
@@ -33,12 +31,12 @@ export function SchedulePanel({ tournamentId }: { tournamentId: string }) {
     return m
   }, [matches.data])
 
-  const removeRound = (id: string, label: string) => {
-    const ok = window.confirm(
+  const removeRound = (id: string, label: string) =>
+    confirmAndMutate(
       `¿Eliminar "${label}"?\n\nSus partidos no se borran: quedan sin jornada asignada.`,
+      delRound,
+      id,
     )
-    if (ok) delRound.mutate(id, { onError: (e) => window.alert(friendlyMessage(e)) })
-  }
 
   return (
     <>

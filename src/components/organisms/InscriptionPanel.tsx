@@ -13,7 +13,7 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
-import { friendlyMessage } from '@/lib/errors'
+import { alertOnError, confirmAndMutate } from '@/lib/mutationHelpers'
 
 /** Inscribir / dar de baja clubes en un torneo (RF-22b). */
 export function InscriptionPanel({ tournamentId }: { tournamentId: string }) {
@@ -43,17 +43,17 @@ export function InscriptionPanel({ tournamentId }: { tournamentId: string }) {
     if (checked.size === 0) return
     enroll.mutate([...checked], {
       onSuccess: () => setChecked(new Set()),
-      onError: (e) => window.alert(friendlyMessage(e)),
+      onError: alertOnError,
     })
   }
 
-  const removeEnrollment = (teamId: string, name: string) => {
-    const ok = window.confirm(
+  const removeEnrollment = (teamId: string, name: string) =>
+    confirmAndMutate(
       `¿Dar de baja a "${name}" de este torneo?\n\nSe borran en cascada sus ` +
         `partidos, estadísticas y finanzas de este torneo (el club se conserva).`,
+      remove,
+      teamId,
     )
-    if (ok) remove.mutate(teamId, { onError: (e) => window.alert(friendlyMessage(e)) })
-  }
 
   if (clubs.isLoading || teams.isLoading) return <LoadingState />
   if (clubs.isError) return <ErrorState error={clubs.error} onRetry={() => clubs.refetch()} />

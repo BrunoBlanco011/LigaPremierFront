@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import type { UserRole } from '@/types/api'
 import { useCreateUser, type UserInput } from '@/features/users/mutations'
 import { ApiError, friendlyMessage } from '@/lib/errors'
+import { applyApiFieldErrors } from '@/lib/formErrors'
 import { Modal } from '@/components/molecules/Modal'
 import { FormField } from '@/components/molecules/FormField'
 import { Label } from '@/components/atoms/Label'
@@ -42,6 +43,7 @@ export function UserForm({ onClose }: { onClose: () => void }) {
       if (err instanceof ApiError && err.status === 409) {
         setError('email', { message: 'Ya existe un usuario con ese correo.' })
       }
+      applyApiFieldErrors(err, setError, ['full_name', 'email', 'password', 'role'])
       setFormError(friendlyMessage(err))
     }
   })

@@ -8,6 +8,7 @@ import {
 } from '@/features/clubs/mutations'
 import { useCoaches } from '@/features/users/queries'
 import { ApiError, friendlyMessage } from '@/lib/errors'
+import { applyApiFieldErrors } from '@/lib/formErrors'
 import { Modal } from '@/components/molecules/Modal'
 import { FormField } from '@/components/molecules/FormField'
 import { Label } from '@/components/atoms/Label'
@@ -62,6 +63,7 @@ export function ClubForm({
       if (err instanceof ApiError && err.status === 409) {
         setError('name', { message: 'Ya existe un club con ese nombre.' })
       }
+      applyApiFieldErrors(err, setError, ['name', 'coach_name', 'coach_user_id'])
       setFormError(friendlyMessage(err))
     }
   })

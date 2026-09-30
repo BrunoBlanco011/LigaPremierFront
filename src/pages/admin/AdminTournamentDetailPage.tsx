@@ -1,4 +1,4 @@
-import { Route, Routes, useParams } from 'react-router-dom'
+import { Navigate, Route, Routes, useParams } from 'react-router-dom'
 import { useTournament } from '@/features/tournaments/queries'
 import { InscriptionPanel } from '@/components/organisms/InscriptionPanel'
 import { SchedulePanel } from '@/components/organisms/SchedulePanel'
@@ -49,6 +49,7 @@ export function AdminTournamentDetailPage() {
           <Route path="partidos/:mid/estadisticas" element={<StatSheetPage />} />
           <Route path="tabla" element={<StandingsAdminPanel tournamentId={id} />} />
           <Route path="finanzas" element={<FinancePanel tournamentId={id} />} />
+          <Route path="*" element={<Navigate to={base} replace />} />
         </Routes>
       </div>
     </>

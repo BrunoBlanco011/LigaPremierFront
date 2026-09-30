@@ -15,7 +15,7 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
-import { friendlyMessage } from '@/lib/errors'
+import { alertOnError, confirmAndMutate } from '@/lib/mutationHelpers'
 
 /** Gestión de plantilla del club (RF-41): alta, edición, baja y eliminación.
  *  `extraActions` permite inyectar acciones adicionales por jugador (ej. transferir, solo admin). */
@@ -38,16 +38,16 @@ export function RosterManager({
   const deactivate = (p: Player) =>
     update.mutate(
       { id: p.id, input: { is_active: !p.is_active } },
-      { onError: (e) => window.alert(friendlyMessage(e)) },
+      { onError: alertOnError },
     )
 
-  const remove = (p: Player) => {
-    const ok = window.confirm(
+  const remove = (p: Player) =>
+    confirmAndMutate(
       `¿Eliminar a ${p.full_name}?\n\nSe borran también todas sus estadísticas. ` +
         `Si solo quieres liberarlo, usa "Dar de baja".`,
+      del,
+      p.id,
     )
-    if (ok) del.mutate(p.id, { onError: (e) => window.alert(friendlyMessage(e)) })
-  }
 
   return (
     <>

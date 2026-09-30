@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Plus, Trash2 } from 'lucide-react'
 import { useStandings } from '@/features/standings/queries'
 import {
@@ -19,6 +19,8 @@ import {
   LoadingState,
 } from '@/components/molecules/StateView'
 import { friendlyMessage } from '@/lib/errors'
+import { alertOnError } from '@/lib/mutationHelpers'
+import { indexById } from '@/lib/collections'
 
 /** Tabla del admin con ajustes manuales de puntos (RF-27). */
 export function StandingsAdminPanel({ tournamentId }: { tournamentId: string }) {
@@ -34,8 +36,8 @@ export function StandingsAdminPanel({ tournamentId }: { tournamentId: string }) 
   const [reason, setReason] = useState('')
   const [error, setError] = useState<string | null>(null)
 
-  const teamName = (id: string) =>
-    teams.data?.find((t) => t.id === id)?.name ?? '—'
+  const teamsById = useMemo(() => indexById(teams.data), [teams.data])
+  const teamName = (id: string) => teamsById.get(id)?.name ?? '—'
 
   const submit = () => {
     setError(null)
@@ -104,7 +106,7 @@ export function StandingsAdminPanel({ tournamentId }: { tournamentId: string }) 
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => del.mutate(a.id, { onError: (e) => window.alert(friendlyMessage(e)) })}
+                        onClick={() => del.mutate(a.id, { onError: alertOnError })}
                         disabled={del.isPending}
                         aria-label="Eliminar ajuste"
                       >

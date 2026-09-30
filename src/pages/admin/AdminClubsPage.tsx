@@ -12,7 +12,7 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
-import { friendlyMessage } from '@/lib/errors'
+import { confirmAndMutate } from '@/lib/mutationHelpers'
 
 export function AdminClubsPage() {
   const clubs = useClubs()
@@ -20,13 +20,13 @@ export function AdminClubsPage() {
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Club | undefined>(undefined)
 
-  const onDelete = (c: Club) => {
-    const ok = window.confirm(
+  const onDelete = (c: Club) =>
+    confirmAndMutate(
       `¿Eliminar el club "${c.name}"?\n\nSolo se permite si nunca se ha inscrito ` +
         `a un torneo (para no perder el historial).`,
+      del,
+      c.id,
     )
-    if (ok) del.mutate(c.id, { onError: (e) => window.alert(friendlyMessage(e)) })
-  }
 
   return (
     <>

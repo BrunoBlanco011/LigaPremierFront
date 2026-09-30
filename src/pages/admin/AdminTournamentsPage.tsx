@@ -12,7 +12,7 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
-import { friendlyMessage } from '@/lib/errors'
+import { confirmAndMutate } from '@/lib/mutationHelpers'
 import { formatDate } from '@/lib/format'
 
 export function AdminTournamentsPage() {
@@ -30,17 +30,14 @@ export function AdminTournamentsPage() {
     setFormOpen(true)
   }
 
-  const onDelete = (t: Tournament) => {
-    const ok = window.confirm(
+  const onDelete = (t: Tournament) =>
+    confirmAndMutate(
       `¿Eliminar "${t.name}"?\n\nEsto borra en cascada las inscripciones, jornadas, ` +
         `partidos, estadísticas y finanzas del torneo. Los clubes y sus jugadores se ` +
         `conservan. Considera cambiar el estado a "Cancelado" o "Finalizado" en su lugar.`,
+      del,
+      t.id,
     )
-    if (!ok) return
-    del.mutate(t.id, {
-      onError: (e) => window.alert(friendlyMessage(e)),
-    })
-  }
 
   return (
     <>

@@ -14,7 +14,8 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
-import { friendlyMessage } from '@/lib/errors'
+import { confirmAndMutate } from '@/lib/mutationHelpers'
+import { indexById } from '@/lib/collections'
 import { formatDateTime } from '@/lib/format'
 
 /** Partidos en admin: CRUD + capturar resultado (RF-25/26). */
@@ -26,16 +27,11 @@ export function MatchesPanel({ tournamentId }: { tournamentId: string }) {
   const [editing, setEditing] = useState<Match | undefined>(undefined)
   const [scoring, setScoring] = useState<Match | null>(null)
 
-  const teamsById = useMemo(
-    () => new Map((teams.data ?? []).map((t) => [t.id, t])),
-    [teams.data],
-  )
+  const teamsById = useMemo(() => indexById(teams.data), [teams.data])
   const teamName = (id: string) => teamsById.get(id)?.name ?? '—'
 
-  const remove = (m: Match) => {
-    const ok = window.confirm('¿Eliminar este partido?')
-    if (ok) del.mutate(m.id, { onError: (e) => window.alert(friendlyMessage(e)) })
-  }
+  const remove = (m: Match) =>
+    confirmAndMutate('¿Eliminar este partido?', del, m.id)
 
   const played = (m: Match) => m.status === 'finished' || m.status === 'forfeit'
 
