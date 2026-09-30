@@ -105,6 +105,14 @@ export interface StandingRow {
   adjustment_reasons: string[]
 }
 
+/** Ajuste manual de puntos en la tabla (RF-27). */
+export interface StandingAdjustment {
+  id: UUID
+  team_id: UUID
+  points: number
+  reason: string
+}
+
 export interface PlayerStat {
   player_id: UUID
   attended: boolean

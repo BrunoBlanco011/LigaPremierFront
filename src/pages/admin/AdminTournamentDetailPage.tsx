@@ -1,6 +1,11 @@
 import { Route, Routes, useParams } from 'react-router-dom'
 import { useTournament } from '@/features/tournaments/queries'
 import { InscriptionPanel } from '@/components/organisms/InscriptionPanel'
+import { SchedulePanel } from '@/components/organisms/SchedulePanel'
+import { MatchesPanel } from '@/components/organisms/MatchesPanel'
+import { StandingsAdminPanel } from '@/components/organisms/StandingsAdminPanel'
+import { FinancePanel } from '@/components/organisms/FinancePanel'
+import { StatSheetPage } from '@/pages/admin/StatSheetPage'
 import { TabNav } from '@/components/organisms/TabNav'
 import type { TabItem } from '@/components/organisms/TabNav'
 import { Placeholder } from '@/components/molecules/Placeholder'
@@ -39,10 +44,11 @@ export function AdminTournamentDetailPage() {
         <Routes>
           <Route index element={<Placeholder title="Resumen del torneo" rf="RF-11" />} />
           <Route path="equipos" element={<InscriptionPanel tournamentId={id} />} />
-          <Route path="rol-de-juegos" element={<Placeholder title="Rol de juegos" rf="RF-23 / RF-24" />} />
-          <Route path="partidos" element={<Placeholder title="Partidos y resultados" rf="RF-25 / RF-26" />} />
-          <Route path="tabla" element={<Placeholder title="Tabla y ajustes" rf="RF-27" />} />
-          <Route path="finanzas" element={<Placeholder title="Finanzas" rf="RF-29 a RF-31" />} />
+          <Route path="rol-de-juegos" element={<SchedulePanel tournamentId={id} />} />
+          <Route path="partidos" element={<MatchesPanel tournamentId={id} />} />
+          <Route path="partidos/:mid/estadisticas" element={<StatSheetPage />} />
+          <Route path="tabla" element={<StandingsAdminPanel tournamentId={id} />} />
+          <Route path="finanzas" element={<FinancePanel tournamentId={id} />} />
         </Routes>
       </div>
     </>
