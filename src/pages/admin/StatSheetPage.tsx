@@ -60,7 +60,8 @@ export function StatSheetPage() {
     setSaved(false)
     setEdits((prev) => {
       const next = new Map(prev)
-      next.set(playerId, { ...valueOf(playerId), ...patch })
+      const current = prev.get(playerId) ?? base.get(playerId) ?? blank(playerId)
+      next.set(playerId, { ...current, ...patch })
       return next
     })
   }

@@ -40,6 +40,10 @@ export function ResultForm({
       setError('Captura ambos marcadores.')
       return
     }
+    if (!Number.isFinite(h) || !Number.isFinite(a) || h < 0 || a < 0) {
+      setError('Los marcadores deben ser números válidos (0 o más).')
+      return
+    }
     if (h === a) {
       setError('No hay empates: el marcador debe incluir el tiempo extra.')
       return

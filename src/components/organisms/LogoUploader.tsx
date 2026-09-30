@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Upload } from 'lucide-react'
 import { useUploadClubLogo } from '@/features/clubs/mutations'
 import { TeamBadge } from '@/components/molecules/TeamBadge'
@@ -22,6 +22,12 @@ export function LogoUploader({
   const inputRef = useRef<HTMLInputElement>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  // Libera el object URL anterior al reemplazarlo o al desmontar.
+  useEffect(() => {
+    if (!preview) return
+    return () => URL.revokeObjectURL(preview)
+  }, [preview])
 
   const pick = (file: File) => {
     setError(null)
