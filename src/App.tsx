@@ -12,12 +12,16 @@ import { ResultsTab } from '@/pages/public/tabs/ResultsTab'
 import { TeamsTab } from '@/pages/public/tabs/TeamsTab'
 import { StatsTab } from '@/pages/public/tabs/StatsTab'
 import { MatchDetailPage } from '@/pages/public/MatchDetailPage'
-import { TeamProfilePage } from '@/pages/public/TeamProfilePage'
+import { TournamentTeamPage } from '@/pages/public/TournamentTeamPage'
+import { ClubsPage } from '@/pages/public/ClubsPage'
+import { ClubProfilePage } from '@/pages/public/ClubProfilePage'
 import { PlayerProfilePage } from '@/pages/public/PlayerProfilePage'
 import { LoginPage } from '@/pages/auth/LoginPage'
 
 import { AdminTournamentsPage } from '@/pages/admin/AdminTournamentsPage'
 import { AdminTournamentDetailPage } from '@/pages/admin/AdminTournamentDetailPage'
+import { AdminClubsPage } from '@/pages/admin/AdminClubsPage'
+import { AdminClubPlayersPage } from '@/pages/admin/AdminClubPlayersPage'
 import { AdminUsersPage } from '@/pages/admin/AdminUsersPage'
 import { CoachHomePage } from '@/pages/coach/CoachHomePage'
 import { CoachRosterPage } from '@/pages/coach/CoachRosterPage'
@@ -28,7 +32,10 @@ export default function App() {
       {/* Sitio público */}
       <Route element={<PublicLayout />}>
         <Route index element={<HomePage />} />
+        <Route path="clubes" element={<ClubsPage />} />
+        <Route path="clubes/:id" element={<ClubProfilePage />} />
         <Route path="torneos/:id/partidos/:mid" element={<MatchDetailPage />} />
+        <Route path="torneos/:id/equipos/:teamId" element={<TournamentTeamPage />} />
         <Route path="torneos/:id" element={<TournamentPage />}>
           <Route index element={<StandingsTab />} />
           <Route path="rol" element={<ScheduleTab />} />
@@ -36,7 +43,6 @@ export default function App() {
           <Route path="equipos" element={<TeamsTab />} />
           <Route path="estadisticas" element={<StatsTab />} />
         </Route>
-        <Route path="equipos/:id" element={<TeamProfilePage />} />
         <Route path="jugadores/:id" element={<PlayerProfilePage />} />
       </Route>
 
@@ -49,6 +55,8 @@ export default function App() {
           <Route index element={<Navigate to="torneos" replace />} />
           <Route path="torneos" element={<AdminTournamentsPage />} />
           <Route path="torneos/:id/*" element={<AdminTournamentDetailPage />} />
+          <Route path="clubes" element={<AdminClubsPage />} />
+          <Route path="clubes/:id/jugadores" element={<AdminClubPlayersPage />} />
           <Route path="usuarios" element={<AdminUsersPage />} />
         </Route>
       </Route>
@@ -57,7 +65,7 @@ export default function App() {
       <Route element={<ProtectedRoute role="coach" />}>
         <Route path="coach" element={<CoachLayout />}>
           <Route index element={<CoachHomePage />} />
-          <Route path="equipos/:id" element={<CoachRosterPage />} />
+          <Route path="clubes/:id" element={<CoachRosterPage />} />
         </Route>
       </Route>
 

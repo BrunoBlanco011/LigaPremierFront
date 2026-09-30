@@ -4,8 +4,11 @@ import type { Tournament, TournamentStatus } from '@/types/api'
 
 export const tournamentKeys = {
   all: ['tournaments'] as const,
-  list: (status?: TournamentStatus) => ['tournaments', { status }] as const,
-  detail: (id: string) => ['tournaments', id] as const,
+  // 'list'/'detail' namespaces para no solaparse con los sub-recursos
+  // anidados (['tournaments', <id>, 'standings'|'matches'|...]).
+  lists: ['tournaments', 'list'] as const,
+  list: (status?: TournamentStatus) => ['tournaments', 'list', { status }] as const,
+  detail: (id: string) => ['tournaments', 'detail', id] as const,
 }
 
 export function useTournaments(status?: TournamentStatus) {

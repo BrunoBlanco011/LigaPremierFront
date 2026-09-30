@@ -60,13 +60,27 @@ async function request<T>(
 
   if (res.status === 204) return undefined as T
 
-  const payload = await res.json().catch(() => null)
-
-  if (!res.ok) {
-    throw new ApiError(res.status, payload?.detail ?? payload)
+  // Un cuerpo vacío o no-JSON (200 sin body, 500 con HTML) no debe romper:
+  // se parsea con tolerancia y se conserva el texto crudo como detalle.
+  const raw = await res.text()
+  let payload: unknown = null
+  if (raw) {
+    try {
+      payload = JSON.parse(raw)
+    } catch {
+      payload = raw
+    }
   }
 
-  return payload as T
+  if (!res.ok) {
+    const detail =
+      payload && typeof payload === 'object' && 'detail' in payload
+        ? (payload as { detail: unknown }).detail
+        : (payload ?? `Error ${res.status}`)
+    throw new ApiError(res.status, detail)
+  }
+
+  return (payload ?? undefined) as T
 }
 
 export const api = {

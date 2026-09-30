@@ -31,20 +31,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let active = true
 
-    async function init() {
-      await loadMe()
-      if (active) setLoading(false)
-    }
-    init()
+    // RF-04: una sola fuente de verdad. onAuthStateChange emite INITIAL_SESSION
+    // al montar, así que no hace falta un init() aparte (evita el /me duplicado).
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!active) return
 
-    // RF-04: reaccionar a cambios de sesión (login, logout, refresh de token).
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      // El refresh de token no cambia el usuario: no re-consultamos /me.
+      if (event === 'TOKEN_REFRESHED') return
+
       if (!session) {
         setUser(null)
         queryClient.clear()
-      } else {
-        loadMe()
+        setLoading(false)
+        return
       }
+
+      // Diferido: no se debe llamar a supabase dentro del propio callback.
+      setTimeout(() => {
+        if (!active) return
+        loadMe().finally(() => {
+          if (active) setLoading(false)
+        })
+      }, 0)
     })
 
     return () => {

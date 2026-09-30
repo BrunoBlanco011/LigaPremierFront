@@ -2,7 +2,10 @@ import { NavLink, Link } from 'react-router-dom'
 import { Shield } from 'lucide-react'
 import { useAuth } from '@/auth/useAuth'
 
-const links = [{ to: '/', label: 'Torneos', end: true }]
+const links = [
+  { to: '/', label: 'Torneos', end: true },
+  { to: '/clubes', label: 'Clubes', end: false },
+]
 
 export function Navbar() {
   const { user } = useAuth()

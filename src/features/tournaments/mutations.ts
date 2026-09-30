@@ -20,7 +20,7 @@ export function useCreateTournament() {
   return useMutation({
     mutationFn: (input: TournamentInput) =>
       api.post<Tournament>('/tournaments', input),
-    onSuccess: () => qc.invalidateQueries({ queryKey: tournamentKeys.all }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: tournamentKeys.lists }),
   })
 }
 
@@ -29,7 +29,10 @@ export function useUpdateTournament(id: string) {
   return useMutation({
     mutationFn: (input: Partial<TournamentInput>) =>
       api.patch<Tournament>(`/tournaments/${id}`, input),
-    onSuccess: () => qc.invalidateQueries({ queryKey: tournamentKeys.all }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: tournamentKeys.lists })
+      qc.invalidateQueries({ queryKey: tournamentKeys.detail(id) })
+    },
   })
 }
 
@@ -37,6 +40,6 @@ export function useDeleteTournament() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => api.del<void>(`/tournaments/${id}`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: tournamentKeys.all }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: tournamentKeys.lists }),
   })
 }

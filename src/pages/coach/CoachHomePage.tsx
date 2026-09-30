@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useMyTeams } from '@/features/coach/queries'
+import { useMyClubs } from '@/features/coach/queries'
 import { TeamBadge } from '@/components/molecules/TeamBadge'
 import {
   EmptyState,
@@ -7,34 +7,35 @@ import {
   LoadingState,
 } from '@/components/molecules/StateView'
 
+/** RF-40: mis clubes. */
 export function CoachHomePage() {
-  const teams = useMyTeams()
+  const clubs = useMyClubs()
 
   return (
     <>
       <p className="eyebrow">Panel de coach</p>
       <h1 className="page__title" style={{ fontSize: 30, marginBottom: 24 }}>
-        Mis equipos
+        Mis clubes
       </h1>
 
-      {teams.isLoading ? (
+      {clubs.isLoading ? (
         <LoadingState />
-      ) : teams.isError ? (
-        <ErrorState error={teams.error} onRetry={() => teams.refetch()} />
-      ) : !teams.data || teams.data.length === 0 ? (
+      ) : clubs.isError ? (
+        <ErrorState error={clubs.error} onRetry={() => clubs.refetch()} />
+      ) : !clubs.data || clubs.data.length === 0 ? (
         <EmptyState
-          title="Aún no tienes equipo asignado"
-          message="Contacta al administrador para que te asigne a un equipo."
+          title="Aún no tienes club asignado"
+          message="Contacta al administrador para que te asigne a un club."
         />
       ) : (
         <div className="grid grid--3">
-          {teams.data.map((team) => (
+          {clubs.data.map((club) => (
             <Link
-              key={team.id}
-              to={`/coach/equipos/${team.id}`}
+              key={club.id}
+              to={`/coach/clubes/${club.id}`}
               className="card card--pad tcard"
             >
-              <TeamBadge name={team.name} logoUrl={team.logo_url} size={44} />
+              <TeamBadge name={club.name} logoUrl={club.logo_url} size={44} />
             </Link>
           ))}
         </div>

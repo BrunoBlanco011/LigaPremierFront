@@ -1,7 +1,8 @@
 import { useState } from 'react'
+import type { ReactNode } from 'react'
 import { UserPlus, Pencil, UserMinus, UserCheck, Trash2 } from 'lucide-react'
 import type { Player } from '@/types/api'
-import { useTeamPlayers } from '@/features/teams/queries'
+import { useClubPlayers } from '@/features/clubs/queries'
 import {
   useDeletePlayer,
   useUpdatePlayer,
@@ -16,11 +17,18 @@ import {
 } from '@/components/molecules/StateView'
 import { friendlyMessage } from '@/lib/errors'
 
-/** Gestión de roster (RF-41): alta, edición, baja y eliminación. */
-export function RosterManager({ teamId }: { teamId: string }) {
-  const players = useTeamPlayers(teamId)
-  const update = useUpdatePlayer(teamId)
-  const del = useDeletePlayer(teamId)
+/** Gestión de plantilla del club (RF-41): alta, edición, baja y eliminación.
+ *  `extraActions` permite inyectar acciones adicionales por jugador (ej. transferir, solo admin). */
+export function RosterManager({
+  clubId,
+  extraActions,
+}: {
+  clubId: string
+  extraActions?: (player: Player) => ReactNode
+}) {
+  const players = useClubPlayers(clubId)
+  const update = useUpdatePlayer(clubId)
+  const del = useDeletePlayer(clubId)
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Player | undefined>(undefined)
   const [showInactive, setShowInactive] = useState(false)
@@ -94,6 +102,7 @@ export function RosterManager({ teamId }: { teamId: string }) {
                   </td>
                   <td>
                     <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+                      {extraActions?.(p)}
                       <Button
                         size="sm"
                         variant="outline"
@@ -133,7 +142,7 @@ export function RosterManager({ teamId }: { teamId: string }) {
 
       {formOpen && (
         <PlayerForm
-          teamId={teamId}
+          clubId={clubId}
           player={editing}
           onClose={() => setFormOpen(false)}
         />

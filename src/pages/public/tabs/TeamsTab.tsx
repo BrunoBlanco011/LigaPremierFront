@@ -26,7 +26,11 @@ export function TeamsTab() {
   return (
     <div className="grid grid--3">
       {teams.data.map((team) => (
-        <Link key={team.id} to={`/equipos/${team.id}`} className="card card--pad tcard">
+        <Link
+          key={team.id}
+          to={`/torneos/${tournamentId}/equipos/${team.id}`}
+          className="card card--pad tcard"
+        >
           <TeamBadge name={team.name} logoUrl={team.logo_url} size={44} />
           {team.coach_name && (
             <span className="tcard__meta">Entrenador: {team.coach_name}</span>

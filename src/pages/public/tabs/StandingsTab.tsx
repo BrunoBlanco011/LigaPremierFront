@@ -23,5 +23,5 @@ export function StandingsTab() {
       />
     )
 
-  return <StandingsTable rows={standings.data} />
+  return <StandingsTable rows={standings.data} tournamentId={tournamentId} />
 }

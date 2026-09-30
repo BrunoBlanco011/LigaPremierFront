@@ -4,7 +4,7 @@ import { Sidebar } from '@/components/organisms/Sidebar'
 import type { SidebarItem } from '@/components/organisms/Sidebar'
 
 const items: SidebarItem[] = [
-  { to: '/coach', label: 'Mis equipos', icon: Users, end: true },
+  { to: '/coach', label: 'Mis clubes', icon: Users, end: true },
 ]
 
 export function CoachLayout() {
