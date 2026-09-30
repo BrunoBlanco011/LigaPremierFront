@@ -39,9 +39,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // El refresh de token no cambia el usuario: no re-consultamos /me.
       if (event === 'TOKEN_REFRESHED') return
 
-      if (!session) {
+      // Cierre de sesión real: limpiar usuario y caché.
+      if (event === 'SIGNED_OUT') {
         setUser(null)
         queryClient.clear()
+        setLoading(false)
+        return
+      }
+
+      // Sin sesión (INITIAL_SESSION al cargar deslogueado): NO limpiar la
+      // caché — nukearía las queries públicas que recién montan.
+      if (!session) {
+        setUser(null)
         setLoading(false)
         return
       }
