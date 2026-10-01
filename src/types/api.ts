@@ -189,6 +189,21 @@ export interface FinanceMovement {
   match_id: UUID | null
 }
 
+/** Invitación de club (link temporal de auto-registro). */
+export interface ClubInvite {
+  id: UUID
+  club_id: UUID
+  token: string
+  expires_at: string
+  created_by: UUID | null
+}
+
+/** Datos públicos de una invitación válida (página de auto-registro). */
+export interface InviteInfo {
+  club: Pick<Club, 'id' | 'name' | 'logo_url'>
+  expires_at: string
+}
+
 export interface AuthTokens {
   access_token: string
   refresh_token: string

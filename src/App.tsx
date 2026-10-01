@@ -16,6 +16,7 @@ import { TournamentTeamPage } from '@/pages/public/TournamentTeamPage'
 import { ClubsPage } from '@/pages/public/ClubsPage'
 import { ClubProfilePage } from '@/pages/public/ClubProfilePage'
 import { PlayerProfilePage } from '@/pages/public/PlayerProfilePage'
+import { JoinTeamPage } from '@/pages/public/JoinTeamPage'
 import { LoginPage } from '@/pages/auth/LoginPage'
 
 import { AdminTournamentsPage } from '@/pages/admin/AdminTournamentsPage'
@@ -46,8 +47,9 @@ export default function App() {
         <Route path="jugadores/:id" element={<PlayerProfilePage />} />
       </Route>
 
-      {/* Autenticación */}
+      {/* Autenticación y auto-registro por link */}
       <Route path="login" element={<LoginPage />} />
+      <Route path="unirse/:token" element={<JoinTeamPage />} />
 
       {/* Panel admin */}
       <Route element={<ProtectedRoute role="admin" />}>

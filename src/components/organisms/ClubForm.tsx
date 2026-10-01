@@ -21,18 +21,21 @@ interface FormValues {
   coach_user_id: string
 }
 
-/** Alta y edición de club (RF-21). */
+/** Alta y edición de club (RF-21). Con `hideCoachAssignment`, el coach edita
+ *  su propio club sin el selector de coach (que es admin-only). */
 export function ClubForm({
   club,
   onClose,
+  hideCoachAssignment = false,
 }: {
   club?: Club
   onClose: () => void
+  hideCoachAssignment?: boolean
 }) {
   const isEdit = Boolean(club)
   const create = useCreateClub()
   const update = useUpdateClub(club?.id ?? '')
-  const coaches = useCoaches()
+  const coaches = useCoaches(!hideCoachAssignment)
   const [formError, setFormError] = useState<string | null>(null)
 
   const {
@@ -53,7 +56,8 @@ export function ClubForm({
     const input: ClubInput = {
       name: values.name.trim(),
       coach_name: values.coach_name.trim() || null,
-      coach_user_id: values.coach_user_id || null,
+      // Solo el admin asigna el coach; omitirlo evita un 403 al editar como coach.
+      ...(hideCoachAssignment ? {} : { coach_user_id: values.coach_user_id || null }),
     }
     try {
       if (isEdit && club) await update.mutateAsync(input)
@@ -84,17 +88,19 @@ export function ClubForm({
           placeholder="Nombre del entrenador"
           {...register('coach_name')}
         />
-        <div className="field">
-          <Label htmlFor="coach_user_id">Cuenta de coach (administra la plantilla)</Label>
-          <Select id="coach_user_id" {...register('coach_user_id')}>
-            <option value="">Sin asignar</option>
-            {coaches.data?.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.full_name ?? c.email}
-              </option>
-            ))}
-          </Select>
-        </div>
+        {!hideCoachAssignment && (
+          <div className="field">
+            <Label htmlFor="coach_user_id">Cuenta de coach (administra la plantilla)</Label>
+            <Select id="coach_user_id" {...register('coach_user_id')}>
+              <option value="">Sin asignar</option>
+              {coaches.data?.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.full_name ?? c.email}
+                </option>
+              ))}
+            </Select>
+          </div>
+        )}
 
         <div className="modal__foot">
           <Button type="button" variant="ghost" onClick={onClose}>
