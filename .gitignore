@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Notas locales con credenciales de desarrollo
+ACCESO.local.md
