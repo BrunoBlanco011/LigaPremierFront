@@ -27,14 +27,27 @@ export function formatMoney(amount: string | number): string {
   return Number.isFinite(n) ? money.format(n) : '—'
 }
 
+/** Una fecha sola ("2026-05-18") es un día del calendario: se lee en hora local, no en UTC. */
+function parseDate(iso: string): Date {
+  return /^\d{4}-\d{2}-\d{2}$/.test(iso) ? new Date(`${iso}T00:00:00`) : new Date(iso)
+}
+
 export function formatDate(iso: string | null): string {
   if (!iso) return 'Por definir'
-  return dateLong.format(new Date(iso))
+  return dateLong.format(parseDate(iso))
 }
 
 export function formatDateShort(iso: string | null): string {
   if (!iso) return '—'
-  return dateShort.format(new Date(iso))
+  return dateShort.format(parseDate(iso))
+}
+
+/** Timestamp de la API → valor de un <input type="datetime-local"> en hora local. */
+export function toDateTimeLocal(iso: string | null | undefined): string {
+  if (!iso) return ''
+  const d = new Date(iso)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
 export function formatTime(iso: string | null): string {

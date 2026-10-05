@@ -4,7 +4,13 @@ import type { Round } from '@/types/api'
 
 export interface GenerateScheduleInput {
   start_date?: string | null
-  days_between_rounds?: number
+  /** 0 = lunes … 6 = domingo */
+  weekdays?: number[]
+  /** "HH:MM", hora del primer partido de cada jornada */
+  start_time?: string | null
+  match_duration_minutes?: number
+  venue?: string | null
+  timezone?: string
   double_round?: boolean
   replace_existing?: boolean
 }

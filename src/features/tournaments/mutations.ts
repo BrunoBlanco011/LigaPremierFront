@@ -5,14 +5,10 @@ import { tournamentKeys } from './queries'
 
 export interface TournamentInput {
   name: string
-  season?: string | null
   category?: string | null
   description?: string | null
   start_date?: string | null
-  end_date?: string | null
   status?: Tournament['status']
-  points_win?: number
-  points_loss?: number
 }
 
 export function useCreateTournament() {

@@ -74,8 +74,8 @@ export function AdminTournamentsPage() {
             <thead>
               <tr>
                 <th>Torneo</th>
-                <th>Temporada</th>
                 <th>Inicio</th>
+                <th>Fin</th>
                 <th>Estado</th>
                 <th aria-label="Acciones" />
               </tr>
@@ -88,8 +88,8 @@ export function AdminTournamentsPage() {
                       {t.name}
                     </Link>
                   </td>
-                  <td>{t.season ?? '—'}</td>
                   <td>{formatDate(t.start_date)}</td>
+                  <td>{formatDate(t.end_date)}</td>
                   <td><TournamentStatusPill status={t.status} /></td>
                   <td>
                     <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
