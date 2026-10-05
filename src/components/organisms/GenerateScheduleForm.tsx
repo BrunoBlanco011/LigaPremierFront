@@ -14,6 +14,7 @@ interface FormValues {
   weekdays: string[]
   start_time: string
   match_duration_minutes: number
+  max_matches_per_day: string
   venue: string
   double_round: boolean
 }
@@ -39,6 +40,7 @@ export function GenerateScheduleForm({
       weekdays: [],
       start_time: '',
       match_duration_minutes: 60,
+      max_matches_per_day: '',
       venue: '',
       double_round: false,
     },
@@ -52,6 +54,7 @@ export function GenerateScheduleForm({
       weekdays: values.start_date ? values.weekdays.map(Number) : [],
       start_time: (values.start_date && values.start_time) || null,
       match_duration_minutes: Number(values.match_duration_minutes) || 60,
+      max_matches_per_day: Number(values.max_matches_per_day) || null,
       venue: values.venue.trim() || null,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       double_round: values.double_round,
@@ -97,7 +100,7 @@ export function GenerateScheduleForm({
           </div>
           <p style={{ color: 'var(--ink-soft)', fontSize: 13, marginTop: 6 }}>
             {hasStartDate
-              ? 'Cada jornada cae en el siguiente día de juego. Sin marcar: el mismo día de la semana que la fecha de inicio.'
+              ? 'Cada jornada empieza en el siguiente día de juego libre. Sin marcar: el mismo día de la semana que la fecha de inicio.'
               : 'Elige primero la fecha de inicio para programar días y horarios.'}
           </p>
         </fieldset>
@@ -117,7 +120,23 @@ export function GenerateScheduleForm({
             {...register('match_duration_minutes', { valueAsNumber: true })}
           />
         </div>
-        <FormField label="Sede" placeholder="Campo Norte" maxLength={120} {...register('venue')} />
+        <div className="form-row">
+          <FormField
+            label="Máx. partidos por día"
+            type="number"
+            min={1}
+            placeholder="Sin límite"
+            disabled={!hasStartDate}
+            {...register('max_matches_per_day')}
+          />
+          <FormField label="Sede" placeholder="Campo Norte" maxLength={120} {...register('venue')} />
+        </div>
+        {hasStartDate && (
+          <p style={{ color: 'var(--ink-soft)', fontSize: 13, marginTop: -4, marginBottom: 12 }}>
+            Si una jornada tiene más partidos que el máximo, continúa el siguiente día de juego
+            (p. ej. 6 partidos, máx. 3, lunes y miércoles: 3 el lunes y 3 el miércoles).
+          </p>
+        )}
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, margin: '8px 0' }}>
           <input type="checkbox" {...register('double_round')} />
           Ida y vuelta (doble round)

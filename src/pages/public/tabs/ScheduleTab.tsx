@@ -9,7 +9,7 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
-import { formatDate } from '@/lib/format'
+import { formatDateRange } from '@/lib/format'
 
 export function ScheduleTab() {
   const { tournamentId, teamsById } = useOutletContext<TournamentContext>()
@@ -49,7 +49,7 @@ export function ScheduleTab() {
                 {round.name ?? `Jornada ${round.number}`}
               </span>
               {round.start_date && (
-                <span className="round__bye">{formatDate(round.start_date)}</span>
+                <span className="round__bye">{formatDateRange(round.start_date, round.end_date)}</span>
               )}
               {byeTeam && <span className="round__bye">· Descansa: {byeTeam.name}</span>}
             </div>

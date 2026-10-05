@@ -42,6 +42,12 @@ export function formatDateShort(iso: string | null): string {
   return dateShort.format(parseDate(iso))
 }
 
+/** Fechas de una jornada: "18 de mayo de 2026" o "18 de mayo de 2026 – 20 de mayo de 2026". */
+export function formatDateRange(start: string | null, end: string | null): string {
+  if (!start || !end || start === end) return formatDate(start ?? end)
+  return `${formatDate(start)} – ${formatDate(end)}`
+}
+
 /** Timestamp de la API → valor de un <input type="datetime-local"> en hora local. */
 export function toDateTimeLocal(iso: string | null | undefined): string {
   if (!iso) return ''

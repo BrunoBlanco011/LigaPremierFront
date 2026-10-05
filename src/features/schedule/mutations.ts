@@ -9,6 +9,8 @@ export interface GenerateScheduleInput {
   /** "HH:MM", hora del primer partido de cada jornada */
   start_time?: string | null
   match_duration_minutes?: number
+  /** Si la jornada tiene más partidos, sigue en el siguiente día de juego. */
+  max_matches_per_day?: number | null
   venue?: string | null
   timezone?: string
   double_round?: boolean
