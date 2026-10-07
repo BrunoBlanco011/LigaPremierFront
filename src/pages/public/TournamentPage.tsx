@@ -1,4 +1,4 @@
-import { Outlet, useParams } from 'react-router-dom'
+import { Outlet, useLocation, useParams } from 'react-router-dom'
 import { useMemo } from 'react'
 import type { Team } from '@/types/api'
 import { useTournament } from '@/features/tournaments/queries'
@@ -15,6 +15,7 @@ export interface TournamentContext {
 
 export function TournamentPage() {
   const { id = '' } = useParams()
+  const { pathname } = useLocation()
   const tournament = useTournament(id)
   const teams = useTournamentTeams(id)
 
@@ -53,18 +54,14 @@ export function TournamentPage() {
   return (
     <>
       <section className="hero">
-        <div className="container hero__inner" style={{ padding: '40px 0 28px' }}>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12 }}>
+        <span className="hero__glow hero__glow--green" aria-hidden="true" />
+        <span className="hero__flag" aria-hidden="true" />
+        <div className="container hero__inner hero__inner--compact">
+          <div className="hero__meta">
             <TournamentStatusPill status={t.status} />
-            {t.category && (
-              <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: 14 }}>
-                {t.category}
-              </span>
-            )}
+            {t.category && <span>{t.category}</span>}
           </div>
-          <h1 className="hero__title" style={{ fontSize: 'clamp(30px, 5vw, 48px)' }}>
-            {t.name}
-          </h1>
+          <h1 className="hero__title">{t.name}</h1>
           {t.season && (
             <p className="hero__lead" style={{ margin: '10px 0 0' }}>
               Temporada {t.season}
@@ -73,21 +70,14 @@ export function TournamentPage() {
         </div>
       </section>
 
-      <div
-        style={{
-          position: 'sticky',
-          top: 66,
-          zIndex: 40,
-          background: 'var(--surface)',
-          borderBottom: '1px solid var(--line)',
-        }}
-      >
+      <div className="subnav">
         <div className="container">
           <TabNav tabs={tabs} />
         </div>
       </div>
 
-      <div className="container page">
+      {/* key: al cambiar de pestaña el contenido se vuelve a montar y entra animado */}
+      <div className="container page" key={pathname}>
         <Outlet context={context} />
       </div>
     </>

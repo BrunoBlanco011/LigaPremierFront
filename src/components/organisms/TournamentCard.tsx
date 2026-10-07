@@ -21,7 +21,9 @@ export function TournamentCard({ tournament: t }: { tournament: Tournament }) {
           />
           {formatDate(t.start_date)}
         </span>
-        <ArrowRight size={18} color="var(--flag)" />
+        <span className="tcard__arrow" aria-hidden="true">
+          <ArrowRight size={16} />
+        </span>
       </div>
     </Link>
   )

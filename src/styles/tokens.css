@@ -1,50 +1,97 @@
-/* ── LigaPremier · Design tokens ("Scoreboard") ────────────────── */
+/* ── LigaPremier · Design tokens ("Cancha") ───────────────────────
+   Negro de estadio de noche, verde de cancha, amarillo de bandera y blanco.
+   Regla de contraste: el amarillo nunca va como texto sobre blanco; sobre
+   amarillo el texto siempre es negro. Para texto sobre blanco: verde 600+. */
 :root {
-  /* Brand — stadium night */
-  --brand-900: #0a0f20;
-  --brand-800: #0e1730;
-  --brand-700: #172142;
-  --brand-600: #223057;
-  --brand-300: #7c88a8;
+  /* Negro */
+  --black-950: #050706;
+  --black-900: #0a0d0b;
+  --black-800: #111612;
+  --black-700: #1a211c;
+  --black-600: #27302a;
+  --black-400: #5d685f;
 
-  /* Signature accent — flag */
-  --flag: #ff4d2e;
-  --flag-600: #e63b1e;
-  --flag-050: #fff1ee;
+  /* Verde cancha */
+  --green-700: #075c2c;
+  --green-600: #0b7a3b;
+  --green-500: #12a150;
+  --green-400: #22c55e;
+  --green-100: #d7f5e2;
+  --green-050: #ecfbf2;
 
-  /* Field green — positives / wins */
-  --field: #16a34a;
-  --field-050: #e9f7ef;
+  /* Amarillo bandera */
+  --yellow-500: #f5c400;
+  --yellow-400: #ffd60a;
+  --yellow-300: #ffe352;
+  --yellow-100: #fff4b8;
+  --yellow-050: #fffbe6;
 
-  /* Neutrals */
-  --bg: #f6f7fb;
-  --surface: #ffffff;
-  --surface-2: #f1f3f9;
-  --ink: #0e1730;
-  --ink-soft: #5b6478;
-  --ink-faint: #8a92a6;
-  --line: #e5e8f0;
+  --white: #ffffff;
 
-  /* Semantics */
-  --win: #16a34a;
-  --loss: #e11d48;
+  /* Roles semánticos (usar estos en los componentes) */
+  --primary: var(--green-600);
+  --primary-strong: var(--green-700);
+  --primary-soft: var(--green-050);
+  --on-primary: var(--white);
+
+  --accent: var(--yellow-400);
+  --accent-strong: var(--yellow-500);
+  --accent-soft: var(--yellow-050);
+  --on-accent: var(--black-900);
+
+  --dark: var(--black-900);
+  --dark-2: var(--black-800);
+  --dark-3: var(--black-700);
+  --on-dark: var(--white);
+  --on-dark-soft: rgba(255, 255, 255, 0.72);
+  --on-dark-faint: rgba(255, 255, 255, 0.5);
+  --dark-line: rgba(255, 255, 255, 0.09);
+
+  /* Neutros */
+  --bg: #f6f8f5;
+  --surface: var(--white);
+  --surface-2: #eef3ed;
+  --ink: var(--black-900);
+  --ink-soft: #4b564e;
+  --ink-faint: #6b786f;
+  --line: #e1e7e0;
+
+  /* Semánticos de juego */
+  --win: var(--green-600);
+  --loss: #dc2626;
+  --loss-soft: #fdecec;
   --draw: #94a3b8;
-  --live: #e11d48;
-  --warn: #d97706;
+  --live: #dc2626;
+  --warn: #b45309;
+  --warn-soft: #fff4e0;
 
-  /* Radius & shadow */
+  /* Alias heredado */
+  --field: var(--primary);
+  --field-050: var(--primary-soft);
+
+  /* Radios y sombras */
   --r-sm: 8px;
   --r: 14px;
-  --r-lg: 20px;
-  --shadow-sm: 0 1px 2px rgba(14, 23, 48, 0.06);
-  --shadow-md: 0 10px 30px rgba(14, 23, 48, 0.08);
-  --shadow-lg: 0 24px 60px rgba(14, 23, 48, 0.16);
+  --r-lg: 22px;
+  --shadow-sm: 0 1px 2px rgba(10, 13, 11, 0.06);
+  --shadow-md: 0 12px 32px rgba(10, 13, 11, 0.1);
+  --shadow-lg: 0 28px 70px rgba(10, 13, 11, 0.22);
+  --glow-green: 0 10px 30px rgba(18, 161, 80, 0.28);
+  --glow-yellow: 0 10px 30px rgba(255, 214, 10, 0.35);
 
-  /* Type */
+  /* Movimiento */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 0.16s;
+  --dur: 0.32s;
+  --dur-slow: 0.6s;
+  --stagger: 55ms;
+
+  /* Tipografía */
   --font-display: 'Space Grotesk Variable', system-ui, sans-serif;
   --font-sans: 'Inter Variable', system-ui, sans-serif;
 
-  /* Spacing scale */
+  /* Espaciado */
   --sp-1: 4px;
   --sp-2: 8px;
   --sp-3: 12px;
@@ -53,6 +100,9 @@
   --sp-6: 32px;
   --sp-7: 48px;
   --sp-8: 64px;
+
+  /* Altura de la barra superior (la usan los elementos sticky) */
+  --nav-h: 68px;
 
   color-scheme: light;
 }

@@ -1,0 +1,91 @@
+/* ── Animaciones ──────────────────────────────────────────────────
+   Todas son de entrada: corren una sola vez cuando el elemento se monta
+   (cambio de página, de pestaña o datos que llegan), no en cada render.
+   Solo animan transform/opacity (compositor) y respetan reducir movimiento
+   (regla global en index.css). */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 18px;
+  }
+}
+@keyframes fade {
+  from { opacity: 0; }
+}
+
+/* Escalonado: cada hijo espera según su posición.
+   sibling-index() en navegadores nuevos; en los demás, --sibling-index lo pone
+   src/lib/stagger.ts. Tope de 12 pasos para que las listas largas no tarden. */
+.page > *,
+.dash__main > * > *,
+.hero__inner > *,
+.grid > *,
+.table tbody tr {
+  animation: rise var(--dur-slow) var(--ease-out) both;
+  animation-delay: calc(min(var(--sibling-index, 1), 12) * var(--stagger));
+}
+/* Dentro de @supports: una declaración con var() nunca "cae" a la anterior */
+@supports (animation-delay: calc(sibling-index() * 1s)) {
+  .page > *,
+  .dash__main > * > *,
+  .hero__inner > *,
+  .grid > *,
+  .table tbody tr {
+    animation-delay: calc(min(sibling-index(), 12) * var(--stagger));
+  }
+}
+/* Las filas de tabla y tarjetas internas, más rápidas */
+.table tbody tr {
+  animation-name: fade;
+  animation-duration: var(--dur);
+  --stagger: 35ms;
+}
+/* El hero entra un poco más lento y dramático */
+.hero__inner > * {
+  --stagger: 90ms;
+  animation-duration: 0.8s;
+}
+
+/* Revelado al hacer scroll (scroll-driven animations, mejora progresiva):
+   donde no hay soporte los elementos simplemente se ven, sin animación. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    @keyframes reveal {
+      from {
+        opacity: 0;
+        translate: 0 40px;
+        scale: 0.98;
+      }
+    }
+    .section-head,
+    .round__head,
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+
+    /* El contenido del hero se desvanece y sube mientras sale de la vista */
+    @keyframes hero-out {
+      to {
+        opacity: 0;
+        translate: 0 -60px;
+      }
+    }
+    .hero__parallax {
+      animation: hero-out linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 90%;
+    }
+  }
+}
+
+/* Transiciones de vista (si el navegador las usa) */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
