@@ -25,3 +25,6 @@ dist-ssr
 
 # Notas locales con credenciales de desarrollo
 ACCESO.local.md
+
+# Config local de Claude Code (no versionar)
+.claude/settings.local.json
