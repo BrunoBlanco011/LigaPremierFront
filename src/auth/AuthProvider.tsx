@@ -50,7 +50,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!session) {
         setUser(null)
-        queryClient.clear()
+        // Solo al cerrar sesión: en INITIAL_SESSION (visitante sin sesión) limpiar la
+        // caché cancelaba las consultas públicas en curso y la página quedaba en "Cargando…".
+        if (event === 'SIGNED_OUT') queryClient.clear()
         setLoading(false)
         return
       }
