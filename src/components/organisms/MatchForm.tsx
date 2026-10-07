@@ -14,6 +14,7 @@ import { FormField } from '@/components/molecules/FormField'
 import { Label } from '@/components/atoms/Label'
 import { Select } from '@/components/atoms/Select'
 import { Button } from '@/components/atoms/Button'
+import { toDateTimeLocal } from '@/lib/format'
 
 const STATUS: { value: MatchStatus; label: string }[] = [
   { value: 'scheduled', label: 'Programado' },
@@ -58,7 +59,7 @@ export function MatchForm({
       home_team_id: match?.home_team_id ?? '',
       away_team_id: match?.away_team_id ?? '',
       round_id: match?.round_id ?? '',
-      scheduled_at: match?.scheduled_at?.slice(0, 16) ?? '',
+      scheduled_at: toDateTimeLocal(match?.scheduled_at),
       venue: match?.venue ?? '',
       status: (match?.status as MatchStatus) ?? 'scheduled',
       notes: match?.notes ?? '',
@@ -75,7 +76,7 @@ export function MatchForm({
       home_team_id: values.home_team_id,
       away_team_id: values.away_team_id,
       round_id: values.round_id || null,
-      scheduled_at: values.scheduled_at || null,
+      scheduled_at: values.scheduled_at ? new Date(values.scheduled_at).toISOString() : null,
       venue: values.venue.trim() || null,
       status: values.status,
       notes: values.notes.trim() || null,

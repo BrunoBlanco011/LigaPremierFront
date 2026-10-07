@@ -55,8 +55,14 @@ export function friendlyMessage(err: unknown): string {
         return 'No encontramos lo que buscas.'
       case 409:
         return 'Ya existe un registro con esos datos.'
-      case 422:
-        return 'Revisa los datos del formulario.'
+      case 422: {
+        // Muestra el primer problema de validación para que se sepa qué campo corregir
+        const issue = err.issues?.[0]
+        const field = issue?.loc.filter((p) => p !== 'body').join('.')
+        return issue
+          ? `Revisa los datos del formulario (${field ? `${field}: ` : ''}${issue.msg}).`
+          : 'Revisa los datos del formulario.'
+      }
       default:
         return 'Algo salió mal. Inténtalo de nuevo.'
     }

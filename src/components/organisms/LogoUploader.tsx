@@ -6,7 +6,8 @@ import { Button } from '@/components/atoms/Button'
 import { friendlyMessage } from '@/lib/errors'
 
 const MAX_BYTES = 2 * 1024 * 1024
-const ACCEPTED = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml']
+// SVG no se acepta (puede contener JavaScript y el bucket es público): solo imágenes raster.
+const ACCEPTED = ['image/png', 'image/jpeg', 'image/webp']
 
 /** Subida de logo del club con vista previa y validación (RF-22). */
 export function LogoUploader({
@@ -32,7 +33,7 @@ export function LogoUploader({
   const pick = (file: File) => {
     setError(null)
     if (!ACCEPTED.includes(file.type)) {
-      setError('Formato no válido. Usa PNG, JPG, WEBP o SVG.')
+      setError('Formato no válido. Usa PNG, JPG o WEBP.')
       return
     }
     if (file.size > MAX_BYTES) {
@@ -77,7 +78,7 @@ export function LogoUploader({
           <Upload size={14} /> {upload.isPending ? 'Subiendo…' : 'Cambiar logo'}
         </Button>
         <p style={{ fontSize: 12, color: 'var(--ink-faint)', marginTop: 6 }}>
-          PNG, JPG, WEBP o SVG · máx. 2 MB
+          PNG, JPG o WEBP · máx. 2 MB
         </p>
         {error && <p className="field__error">{error}</p>}
       </div>
