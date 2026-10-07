@@ -11,7 +11,7 @@ import {
   LoadingState,
 } from '@/components/molecules/StateView'
 import { friendlyMessage } from '@/lib/errors'
-import { formatDate } from '@/lib/format'
+import { formatDateRange } from '@/lib/format'
 
 /** Rol de juegos en admin: generar + listar/eliminar jornadas (RF-23/24). */
 export function SchedulePanel({ tournamentId }: { tournamentId: string }) {
@@ -76,7 +76,7 @@ export function SchedulePanel({ tournamentId }: { tournamentId: string }) {
               {rounds.data.map((r) => (
                 <tr key={r.id}>
                   <td style={{ fontWeight: 600 }}>{r.name ?? `Jornada ${r.number}`}</td>
-                  <td>{formatDate(r.start_date)}</td>
+                  <td>{formatDateRange(r.start_date, r.end_date)}</td>
                   <td>{r.bye_team_id ? teamsById.get(r.bye_team_id)?.name ?? '—' : '—'}</td>
                   <td className="num">{matchCountByRound.get(r.id) ?? 0}</td>
                   <td>

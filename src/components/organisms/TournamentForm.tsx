@@ -22,16 +22,16 @@ const STATUS_OPTIONS: { value: TournamentStatus; label: string }[] = [
 
 interface FormValues {
   name: string
-  season: string
   category: string
   start_date: string
-  end_date: string
   status: TournamentStatus
-  points_win: number
-  points_loss: number
 }
 
-/** Alta y edición de torneo (RF-20). */
+/**
+ * Alta y edición de torneo (RF-20).
+ * La fecha de fin la marca el rol de juegos (depende de los equipos inscritos)
+ * y los puntos son fijos: 2 por victoria, 0 por derrota.
+ */
 export function TournamentForm({
   tournament,
   onClose,
@@ -52,13 +52,9 @@ export function TournamentForm({
   } = useForm<FormValues>({
     defaultValues: {
       name: tournament?.name ?? '',
-      season: tournament?.season ?? '',
       category: tournament?.category ?? '',
       start_date: tournament?.start_date ?? '',
-      end_date: tournament?.end_date ?? '',
       status: tournament?.status ?? 'draft',
-      points_win: tournament?.points_win ?? 2,
-      points_loss: tournament?.points_loss ?? 0,
     },
   })
 
@@ -66,13 +62,9 @@ export function TournamentForm({
     setFormError(null)
     const payload: TournamentInput = {
       name: values.name.trim(),
-      season: values.season.trim() || null,
       category: values.category.trim() || null,
       start_date: values.start_date || null,
-      end_date: values.end_date || null,
       status: values.status,
-      points_win: Number(values.points_win),
-      points_loss: Number(values.points_loss),
     }
     try {
       if (isEdit) await update.mutateAsync(payload)
@@ -81,7 +73,7 @@ export function TournamentForm({
     } catch (err) {
       if (err instanceof ApiError && err.issues) {
         // 422: marca el campo con error usando loc
-        for (const key of ['name', 'start_date', 'end_date'] as const) {
+        for (const key of ['name', 'start_date'] as const) {
           const msg = err.fieldError(key)
           if (msg) setError(key, { message: msg })
         }
@@ -104,50 +96,24 @@ export function TournamentForm({
         />
 
         <div className="form-row">
-          <FormField label="Temporada" placeholder="Apertura 2026" {...register('season')} />
           <FormField label="Categoría" placeholder="Mixta" {...register('category')} />
-        </div>
-
-        <div className="form-row">
           <FormField
             label="Inicio"
             type="date"
             error={errors.start_date?.message}
             {...register('start_date')}
           />
-          <FormField
-            label="Fin"
-            type="date"
-            error={errors.end_date?.message}
-            {...register('end_date')}
-          />
         </div>
 
-        <div className="form-row">
-          <div className="field">
-            <Label htmlFor="status">Estado</Label>
-            <Select id="status" {...register('status')}>
-              {STATUS_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </Select>
-          </div>
-          <div className="form-row" style={{ gap: 10 }}>
-            <FormField
-              label="Pts victoria"
-              type="number"
-              min={0}
-              {...register('points_win', { valueAsNumber: true })}
-            />
-            <FormField
-              label="Pts derrota"
-              type="number"
-              min={0}
-              {...register('points_loss', { valueAsNumber: true })}
-            />
-          </div>
+        <div className="field">
+          <Label htmlFor="status">Estado</Label>
+          <Select id="status" {...register('status')}>
+            {STATUS_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </Select>
         </div>
 
         <div className="modal__foot">
