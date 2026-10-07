@@ -123,8 +123,9 @@ Todas las respuestas de error traen `detail`:
 - **Endpoint:** `POST /auth/login` → `{ access_token, refresh_token, token_type, expires_in, user_id }`.
 - Guardar el `access_token` y enviarlo en cada petición. `expires_in` está en segundos.
 - Con credenciales incorrectas responde `401` con "Correo o contrasena incorrectos".
-- *Alternativa:* el frontend puede usar directamente `supabase-js` (`signInWithPassword`) con la
-  anon key; el `access_token` de Supabase es el mismo que acepta el backend.
+- Tras 5 intentos fallidos responde `429` con la cabecera `Retry-After` (segundos de espera).
+- **Siempre por la API** (no con `signInWithPassword` de supabase-js): así aplica el bloqueo por
+  intentos fallidos. Con los tokens se abre la sesión en supabase-js (`setSession`) para que los renueve.
 
 ### RF-02 Identificar al usuario y su rol
 - **Endpoint:** `GET /me` → `{ id, email, full_name, role }`.
@@ -261,7 +262,7 @@ Todas las respuestas de error traen `detail`:
 
 #### RF-22 Logo del club
 - **Endpoint:** `POST /clubs/{id}/logo` (multipart/form-data, campo `file`).
-- Formatos permitidos: PNG, JPG, WEBP y SVG. Tamaño máximo: 2 MB. Validar también en el cliente.
+- Formatos permitidos: PNG, JPG y WEBP (SVG no, por riesgo de XSS). Tamaño máximo: 2 MB. Validar también en el cliente.
 - Responde el club con `logo_url` nuevo. Subir otro logo reemplaza el anterior en todos sus torneos.
 - Mostrar una vista previa antes de subir.
 
@@ -384,7 +385,7 @@ Reproduce la sección de finanzas del Excel: **Inscripción + Multas − Abonos 
 
 #### RF-32 Gestión de usuarios
 - **Endpoints:** `GET /users?role=coach`, `POST /users`, `GET/PATCH/DELETE /users/{id}`.
-- **Crear:** `email`, `password` (mínimo 8 caracteres), `full_name` y `role` (por defecto `coach`).
+- **Crear:** `email`, `password` (mínimo 10 caracteres, con letras y números, sin contener el correo), `full_name` y `role` (por defecto `coach`).
   El usuario queda confirmado y puede iniciar sesión de inmediato.
 - Después de crear un coach, asignarlo a su club desde RF-21 (`coach_user_id`).
 - Un admin no puede cambiar su propio rol ni eliminarse a sí mismo (`422`).

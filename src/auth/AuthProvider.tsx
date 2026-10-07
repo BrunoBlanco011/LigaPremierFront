@@ -7,6 +7,15 @@ import type { User } from '@/types/api'
 import { AuthContext } from './authContext'
 import type { AuthState } from './authContext'
 
+/** Cierre de sesión automático tras este tiempo sin actividad (panel con datos privados). */
+const IDLE_TIMEOUT_MS = 30 * 60 * 1000
+const ACTIVITY_EVENTS = ['pointerdown', 'keydown', 'scroll', 'touchstart'] as const
+
+interface LoginResponse {
+  access_token: string
+  refresh_token: string
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
@@ -61,12 +70,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [loadMe])
 
-  // RF-01: iniciar sesión.
+  // RF-01: iniciar sesión. Pasa por la API (no directo a Supabase) para que aplique
+  // el bloqueo por intentos fallidos y quede en la bitácora de auditoría.
   const signIn = useCallback(
     async (email: string, password: string): Promise<User> => {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const tokens = await api.post<LoginResponse>(
+        '/auth/login',
+        { email, password },
+        { auth: false },
+      )
+      const { error } = await supabase.auth.setSession({
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
       })
       if (error) throw error
       const me = await loadMe()
@@ -82,6 +97,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null)
     queryClient.clear()
   }, [])
+
+  // Cierre por inactividad: si nadie toca la página en IDLE_TIMEOUT_MS se cierra la sesión.
+  useEffect(() => {
+    if (!user) return
+    let timer = window.setTimeout(() => void signOut(), IDLE_TIMEOUT_MS)
+    const reset = () => {
+      window.clearTimeout(timer)
+      timer = window.setTimeout(() => void signOut(), IDLE_TIMEOUT_MS)
+    }
+    ACTIVITY_EVENTS.forEach((e) => window.addEventListener(e, reset, { passive: true }))
+    return () => {
+      window.clearTimeout(timer)
+      ACTIVITY_EVENTS.forEach((e) => window.removeEventListener(e, reset))
+    }
+  }, [user, signOut])
 
   const value = useMemo<AuthState>(
     () => ({

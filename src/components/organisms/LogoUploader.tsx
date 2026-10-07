@@ -4,9 +4,10 @@ import { useUploadClubLogo } from '@/features/clubs/mutations'
 import { TeamBadge } from '@/components/molecules/TeamBadge'
 import { Button } from '@/components/atoms/Button'
 import { friendlyMessage } from '@/lib/errors'
+import { LOGO_MAX_BYTES, LOGO_TYPES, detectImageType } from '@/lib/security'
 
-const MAX_BYTES = 2 * 1024 * 1024
-const ACCEPTED = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml']
+const ACCEPTED: readonly string[] = LOGO_TYPES
+
 
 /** Subida de logo del club con vista previa y validación (RF-22). */
 export function LogoUploader({
@@ -29,14 +30,19 @@ export function LogoUploader({
     return () => URL.revokeObjectURL(preview)
   }, [preview])
 
-  const pick = (file: File) => {
+  const pick = async (file: File) => {
     setError(null)
     if (!ACCEPTED.includes(file.type)) {
-      setError('Formato no válido. Usa PNG, JPG, WEBP o SVG.')
+      setError('Formato no válido. Usa PNG, JPG o WEBP.')
       return
     }
-    if (file.size > MAX_BYTES) {
+    if (file.size > LOGO_MAX_BYTES) {
       setError('El archivo supera 2 MB.')
+      return
+    }
+    // Un archivo renombrado (p. ej. HTML con extensión .png) se rechaza antes de subirlo
+    if ((await detectImageType(file)) !== file.type) {
+      setError('El archivo no es una imagen válida.')
       return
     }
     setPreview(URL.createObjectURL(file))
@@ -65,7 +71,8 @@ export function LogoUploader({
           hidden
           onChange={(e) => {
             const file = e.target.files?.[0]
-            if (file) pick(file)
+            if (file) void pick(file)
+            e.target.value = '' // permite volver a elegir el mismo archivo
           }}
         />
         <Button
@@ -77,7 +84,7 @@ export function LogoUploader({
           <Upload size={14} /> {upload.isPending ? 'Subiendo…' : 'Cambiar logo'}
         </Button>
         <p style={{ fontSize: 12, color: 'var(--ink-faint)', marginTop: 6 }}>
-          PNG, JPG, WEBP o SVG · máx. 2 MB
+          PNG, JPG o WEBP · máx. 2 MB
         </p>
         {error && <p className="field__error">{error}</p>}
       </div>

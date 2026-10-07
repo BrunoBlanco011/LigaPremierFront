@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import type { UserRole } from '@/types/api'
 import { useCreateUser, type UserInput } from '@/features/users/mutations'
 import { ApiError, friendlyMessage } from '@/lib/errors'
+import { PASSWORD_MIN_LENGTH, validatePassword } from '@/lib/security'
 import { Modal } from '@/components/molecules/Modal'
 import { FormField } from '@/components/molecules/FormField'
 import { Label } from '@/components/atoms/Label'
@@ -42,6 +43,10 @@ export function UserForm({ onClose }: { onClose: () => void }) {
       if (err instanceof ApiError && err.status === 409) {
         setError('email', { message: 'Ya existe un usuario con ese correo.' })
       }
+      // La política de contraseñas del servidor llega como error 422 del modelo
+      if (err instanceof ApiError && err.status === 422 && err.issues?.some((i) => /contrasena/i.test(i.msg))) {
+        setError('password', { message: 'La contraseña no cumple la política de seguridad.' })
+      }
       setFormError(friendlyMessage(err))
     }
   })
@@ -68,9 +73,11 @@ export function UserForm({ onClose }: { onClose: () => void }) {
           type="password"
           required
           error={errors.password?.message}
+          autoComplete="new-password"
+          hint={`Mínimo ${PASSWORD_MIN_LENGTH} caracteres, con letras y números`}
           {...register('password', {
             required: 'La contraseña es obligatoria',
-            minLength: { value: 8, message: 'Mínimo 8 caracteres' },
+            validate: (value, values) => validatePassword(value, values.email),
           })}
         />
         <div className="field">

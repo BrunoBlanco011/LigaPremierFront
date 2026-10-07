@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { Shield } from 'lucide-react'
 import { useAuth } from '@/auth/useAuth'
 import { supabaseConfigured } from '@/lib/supabase'
+import { ApiError, friendlyMessage } from '@/lib/errors'
 import { FormField } from '@/components/molecules/FormField'
 import { Button } from '@/components/atoms/Button'
 
@@ -28,11 +29,14 @@ export function LoginPage() {
       const user = await signIn(email, password)
       navigate(user.role === 'admin' ? '/admin' : '/coach', { replace: true })
     } catch (err) {
-      setServerError(
-        err instanceof Error && err.message
-          ? 'Correo o contraseña incorrectos.'
-          : 'No pudimos iniciar sesión. Inténtalo de nuevo.',
-      )
+      // Mensaje genérico: no se revela si el correo existe
+      if (err instanceof ApiError && (err.status === 401 || err.status === 422)) {
+        setServerError('Correo o contraseña incorrectos.')
+      } else if (err instanceof ApiError) {
+        setServerError(friendlyMessage(err)) // 429: cuánto falta para reintentar
+      } else {
+        setServerError('No pudimos iniciar sesión. Inténtalo de nuevo.')
+      }
     }
   })
 
@@ -69,6 +73,7 @@ export function LoginPage() {
             autoComplete="current-password"
             placeholder="••••••••"
             error={errors.password?.message}
+            maxLength={72}
             {...register('password', { required: 'Ingresa tu contraseña' })}
           />
           <Button type="submit" variant="flag" block disabled={isSubmitting}>

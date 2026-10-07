@@ -1,7 +1,14 @@
 import { ApiError } from './errors'
 import { supabase } from './supabase'
 
-const BASE = `${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}/api/v1`
+const API_URL: string = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+const BASE = `${API_URL}/api/v1`
+
+// En producción el token viaja en cada petición: solo por HTTPS.
+const isLocal = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/?$/.test(API_URL)
+if (import.meta.env.PROD && !API_URL.startsWith('https://') && !isLocal) {
+  throw new Error('[LigaPremier] VITE_API_URL debe usar https:// en producción')
+}
 
 type Query = Record<string, string | number | boolean | undefined | null>
 
@@ -27,11 +34,10 @@ function buildUrl(path: string, query?: Query): string {
   return url.toString()
 }
 
-async function authHeader(explicit?: boolean): Promise<Record<string, string>> {
-  if (explicit === false) return {}
+async function accessToken(explicit?: boolean): Promise<string | null> {
+  if (explicit === false) return null
   const { data } = await supabase.auth.getSession()
-  const token = data.session?.access_token
-  return token ? { Authorization: `Bearer ${token}` } : {}
+  return data.session?.access_token ?? null
 }
 
 async function request<T>(
@@ -39,9 +45,8 @@ async function request<T>(
   path: string,
   opts: RequestOptions = {},
 ): Promise<T> {
-  const headers: Record<string, string> = {
-    ...(await authHeader(opts.auth)),
-  }
+  const token = await accessToken(opts.auth)
+  const headers: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {}
 
   let body: BodyInit | undefined
   if (opts.form) {
@@ -56,28 +61,36 @@ async function request<T>(
     headers,
     body,
     signal: opts.signal,
+    // La API usa el token en la cabecera, nunca cookies: no se envían credenciales
+    credentials: 'omit',
+    referrerPolicy: 'no-referrer',
   })
 
   if (res.status === 204) return undefined as T
 
-  // Un cuerpo vacío o no-JSON (200 sin body, 500 con HTML) no debe romper:
-  // se parsea con tolerancia y se conserva el texto crudo como detalle.
+  // Un cuerpo vacío o no-JSON (200 sin body, 500 con HTML de un proxy) no debe romper.
+  // El texto crudo no-JSON nunca se muestra al usuario: puede traer detalles internos.
   const raw = await res.text()
   let payload: unknown = null
   if (raw) {
     try {
       payload = JSON.parse(raw)
     } catch {
-      payload = raw
+      payload = null
     }
   }
 
   if (!res.ok) {
+    // Token expirado o revocado: se cierra la sesión local y AuthProvider manda al login
+    if (res.status === 401 && token) {
+      void supabase.auth.signOut({ scope: 'local' })
+    }
     const detail =
       payload && typeof payload === 'object' && 'detail' in payload
         ? (payload as { detail: unknown }).detail
-        : (payload ?? `Error ${res.status}`)
-    throw new ApiError(res.status, detail)
+        : null
+    const retryAfter = Number(res.headers.get('Retry-After')) || null
+    throw new ApiError(res.status, detail, retryAfter)
   }
 
   return (payload ?? undefined) as T
