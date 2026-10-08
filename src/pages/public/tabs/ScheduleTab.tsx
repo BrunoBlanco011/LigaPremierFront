@@ -4,11 +4,8 @@ import type { Match, Round } from '@/types/api'
 import type { TournamentContext } from '../TournamentPage'
 import { useMatches, useRounds } from '@/features/schedule/queries'
 import { MatchCard } from '@/components/organisms/MatchCard'
-import {
-  EmptyState,
-  ErrorState,
-  LoadingState,
-} from '@/components/molecules/StateView'
+import { EmptyState, ErrorState } from '@/components/molecules/StateView'
+import { MatchesSkeleton } from '@/components/molecules/Skeletons'
 import { formatDateRange } from '@/lib/format'
 
 const dayFmt = new Intl.DateTimeFormat('es-MX', {
@@ -57,14 +54,16 @@ export function ScheduleTab() {
     return sortedRounds[0].id
   }, [sortedRounds, matches.data])
 
-  if (rounds.isLoading || matches.isLoading) return <LoadingState />
-  if (rounds.isError) return <ErrorState error={rounds.error} onRetry={() => rounds.refetch()} />
-  if (matches.isError) return <ErrorState error={matches.error} onRetry={() => matches.refetch()} />
+  if (rounds.isLoading || matches.isLoading) return <MatchesSkeleton count={6} />
+  if (rounds.isError)
+    return <ErrorState error={rounds.error} onRetry={() => rounds.refetch()} resource="el rol de juegos" />
+  if (matches.isError)
+    return <ErrorState error={matches.error} onRetry={() => matches.refetch()} resource="el rol de juegos" />
   if (sortedRounds.length === 0)
     return (
       <EmptyState
-        title="Rol de juegos no publicado"
-        message="El calendario aparecerá cuando el administrador lo genere."
+        title="Aún no hay rol de juegos"
+        message="El administrador lo publicará pronto."
       />
     )
 

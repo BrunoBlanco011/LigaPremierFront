@@ -8,7 +8,8 @@ import { indexById } from '@/lib/collections'
 import { TabNav } from '@/components/organisms/TabNav'
 import type { TabItem } from '@/components/organisms/TabNav'
 import { TournamentHeader } from '@/components/organisms/TournamentHeader'
-import { ErrorState, LoadingState } from '@/components/molecules/StateView'
+import { ErrorState, LoadingState, NotFoundState } from '@/components/molecules/StateView'
+import { ApiError } from '@/lib/errors'
 
 export interface TournamentContext {
   tournamentId: string
@@ -51,9 +52,14 @@ export function TournamentPage() {
     )
   }
   if (tournament.isError || !tournament.data) {
+    const notFound = tournament.error instanceof ApiError && tournament.error.status === 404
     return (
       <div className="pub">
-        <ErrorState error={tournament.error} onRetry={() => tournament.refetch()} />
+        {notFound ? (
+          <NotFoundState title="No encontramos este torneo" />
+        ) : (
+          <ErrorState error={tournament.error} onRetry={() => tournament.refetch()} resource="el torneo" />
+        )}
       </div>
     )
   }

@@ -3,24 +3,21 @@ import type { TournamentContext } from '../TournamentPage'
 import { useStandings } from '@/features/standings/queries'
 import { StandingsTable } from '@/components/organisms/StandingsTable'
 import { StandingsPodium } from '@/components/organisms/StandingsPodium'
-import {
-  EmptyState,
-  ErrorState,
-  LoadingState,
-} from '@/components/molecules/StateView'
+import { EmptyState, ErrorState } from '@/components/molecules/StateView'
+import { StandingsSkeleton } from '@/components/molecules/Skeletons'
 
 export function StandingsTab() {
   const { tournamentId } = useOutletContext<TournamentContext>()
   const standings = useStandings(tournamentId)
 
-  if (standings.isLoading) return <LoadingState />
+  if (standings.isLoading) return <StandingsSkeleton />
   if (standings.isError)
-    return <ErrorState error={standings.error} onRetry={() => standings.refetch()} />
+    return <ErrorState error={standings.error} onRetry={() => standings.refetch()} resource="la tabla" />
   if (!standings.data || standings.data.length === 0)
     return (
       <EmptyState
         title="Aún no hay tabla"
-        message="La tabla aparecerá cuando se jueguen los primeros partidos."
+        message="Aparece cuando se juegue el primer partido."
       />
     )
 

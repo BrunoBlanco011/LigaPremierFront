@@ -5,11 +5,10 @@ import { useMatch, useMatchStats } from '@/features/matches/queries'
 import { useTeamPlayers } from '@/features/teams/queries'
 import { TeamBadge } from '@/components/molecules/TeamBadge'
 import { MatchStatusPill } from '@/components/molecules/StatusPill'
-import {
-  EmptyState,
-  ErrorState,
-  LoadingState,
-} from '@/components/molecules/StateView'
+import { EmptyState, ErrorState, NotFoundState } from '@/components/molecules/StateView'
+import { CardsSkeleton } from '@/components/molecules/Skeletons'
+import { Skeleton } from '@/components/atoms/Skeleton'
+import { ApiError } from '@/lib/errors'
 import { formatDateTime } from '@/lib/format'
 
 type TeamLite = Pick<Team, 'id' | 'name' | 'logo_url'>
@@ -137,16 +136,23 @@ export function MatchDetailPage() {
 
   if (match.isLoading)
     return (
-      <div className="pub">
-        <LoadingState />
+      <div className="pub" style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+        <Skeleton height={150} style={{ borderRadius: 'var(--radius-lg)' }} />
+        <CardsSkeleton count={2} className="grid grid--2" lines={5} />
       </div>
     )
-  if (match.isError || !match.data)
+  if (match.isError || !match.data) {
+    const notFound = match.error instanceof ApiError && match.error.status === 404
     return (
       <div className="pub">
-        <ErrorState error={match.error} onRetry={() => match.refetch()} />
+        {notFound ? (
+          <NotFoundState title="No encontramos este partido" />
+        ) : (
+          <ErrorState error={match.error} onRetry={() => match.refetch()} resource="el partido" />
+        )}
       </div>
     )
+  }
 
   const m = match.data
   const home = m.home_team ?? undefined
@@ -213,10 +219,10 @@ export function MatchDetailPage() {
       </h2>
 
       {stats.isLoading ? (
-        <LoadingState />
+        <CardsSkeleton count={2} className="grid grid--2" lines={5} />
       ) : statsByPlayer.size === 0 ? (
         <EmptyState
-          title="Sin estadísticas"
+          title="Sin estadísticas de este partido"
           message="Las estadísticas de los jugadores aparecerán cuando se capturen."
         />
       ) : (

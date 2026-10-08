@@ -10,7 +10,8 @@ import { FeaturedTournament } from '@/components/organisms/FeaturedTournament'
 import { NextRoundCard } from '@/components/organisms/NextRoundCard'
 import { ResultsTicker } from '@/components/organisms/ResultsTicker'
 import { TeamBadge } from '@/components/molecules/TeamBadge'
-import { EmptyState, ErrorState, LoadingState } from '@/components/molecules/StateView'
+import { EmptyState, ErrorState } from '@/components/molecules/StateView'
+import { CardsSkeleton, ChipsSkeleton } from '@/components/molecules/Skeletons'
 
 const roundLabel = (m?: Match) =>
   m?.round?.name ?? (m?.round?.number != null ? `Jornada ${m.round.number}` : '')
@@ -123,14 +124,14 @@ export function HomePage() {
         <section style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <h2 className="ital ital-h2">Torneos en curso</h2>
           {active.isLoading ? (
-            <LoadingState />
+            <CardsSkeleton count={1} className="" lines={4} />
           ) : active.isError ? (
-            <ErrorState error={active.error} onRetry={() => active.refetch()} />
+            <ErrorState error={active.error} onRetry={() => active.refetch()} resource="los torneos" />
           ) : active.data && active.data.length > 0 ? (
             active.data.map((t) => <FeaturedTournament key={t.id} tournament={t} />)
           ) : (
             <EmptyState
-              title="No hay torneos activos"
+              title="No hay torneos en curso"
               message="Cuando la liga abra un torneo, aparecerá aquí."
             />
           )}
@@ -143,7 +144,7 @@ export function HomePage() {
             <Link to="/clubes" style={{ fontWeight: 600 }}>Ver todos los clubes</Link>
           </div>
           {clubs.isLoading ? (
-            <LoadingState />
+            <ChipsSkeleton count={6} />
           ) : clubs.data && clubs.data.length > 0 ? (
             <div className="clubs-grid">
               {clubs.data.map((c) => (
