@@ -855,3 +855,94 @@ a.mcard:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
 .ital-h2 { margin: 0; font-size: clamp(28px, 5vw, 40px); line-height: 1; }
 .pub { width: 100%; max-width: var(--ancho-contenido); margin: 0 auto; padding: 32px 24px 64px; box-sizing: border-box; }
 .pub--home { padding: 56px 24px; display: flex; flex-direction: column; gap: 56px; }
+
+/* ── Login (pantalla dividida) ──────────────────────────────────── */
+.login2 {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(420px, 1fr);
+}
+.login2__aside {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  padding: 40px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+}
+.login2__back {
+  position: relative;
+  color: var(--color-sobre-verde-2);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+}
+.login2__back:hover { color: #fff; }
+.login2__brand { position: relative; display: flex; flex-direction: column; gap: 24px; }
+.login2__logo {
+  width: 132px;
+  height: 132px;
+  border-radius: 9999px;
+  background: #fff;
+  object-fit: contain;
+  padding: 6px;
+  box-shadow: 0 0 0 6px rgb(239 180 27 / 0.9);
+}
+.login2__brandline { font-size: clamp(64px, 11vw, 112px); line-height: 0.86; }
+.login2__brandsub { font-size: clamp(22px, 3vw, 36px); line-height: 1.1; color: var(--color-sobre-verde-2); }
+.login2__tagline { position: relative; color: var(--color-sobre-verde-2); font-size: 15px; max-width: 42ch; margin: 0; }
+.login2__main {
+  background: var(--color-superficie);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+}
+.login2__form { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 20px; }
+.login2__eyebrow { font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: 0.06em; color: var(--color-texto-2); }
+.login2__title { font-size: clamp(36px, 6vw, 48px); line-height: 0.95; margin: 0; }
+.login2__hint { margin: 0; font-size: 14px; line-height: 20px; color: var(--color-texto-2); }
+@media (max-width: 860px) {
+  .login2 { grid-template-columns: 1fr; }
+  .login2__aside { padding: 20px 20px 28px; gap: 16px; }
+  .login2__logo { width: 72px; height: 72px; }
+  .login2__brand { gap: 14px; }
+  .login2__tagline { display: none; }
+  .login2__main { padding: 28px 16px 48px; }
+}
+
+/* ── Unirse (auto-registro por invitación) ──────────────────────── */
+.join2 { min-height: 100svh; background: var(--color-fondo); }
+.join2__band {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+  padding: 20px 16px 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+.join2__logo { width: 44px; height: 44px; border-radius: 9999px; background: #fff; object-fit: contain; }
+.join2__title { margin: 0; font-size: clamp(32px, 9vw, 40px); line-height: 0.95; }
+.join2__card {
+  max-width: 460px;
+  margin: -48px auto 32px;
+  position: relative;
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 20px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.join2__jersey { display: flex; align-items: center; gap: 16px; }
+.join2__jersey-box { flex: none; background: var(--color-fondo); border-radius: var(--radius-lg); padding: 8px; line-height: 0; }
+.join2__hint { margin: 0; font-size: 14px; line-height: 20px; color: var(--color-texto-2); }
+.join2__expiry { margin: 0; font-size: 13px; line-height: 18px; color: var(--color-texto-2); text-align: center; }
+.join2__state { max-width: 460px; margin: 0 auto; padding: 56px 20px; text-align: center; }
