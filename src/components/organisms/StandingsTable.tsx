@@ -65,7 +65,12 @@ export function StandingsTable({
                   role="cell"
                   style={{
                     fontWeight: 600,
-                    color: r.point_difference > 0 ? 'var(--color-premier)' : 'var(--color-error)',
+                    color:
+                      r.point_difference > 0
+                        ? 'var(--color-premier)'
+                        : r.point_difference < 0
+                          ? 'var(--color-error)'
+                          : 'var(--color-texto-2)',
                   }}
                 >
                   {signed(r.point_difference)}

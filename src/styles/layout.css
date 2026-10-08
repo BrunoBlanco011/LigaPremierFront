@@ -622,13 +622,16 @@
 @media (max-width: 760px) { .podium { grid-template-columns: 1fr; } }
 
 /* ── Tabla de posiciones v2 ─────────────────────────────────────── */
-.stable-wrap { overflow-x: auto; }
+/* El scroll y el recorte viven en el envoltorio para que las columnas
+   Pos.+Equipo puedan quedar fijas (sticky) en móvil. */
+.stable-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radius-lg);
+}
 .stable {
   min-width: 620px;
   background: var(--color-superficie);
-  border: 1px solid var(--color-borde);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
   font-variant-numeric: tabular-nums;
 }
 .stable__head,
@@ -675,6 +678,22 @@
   line-height: 56px;
 }
 .stable__row.is-leader .st-pts { background: rgb(239 180 27 / 0.35); }
+
+/* En móvil, Pos.+Equipo quedan fijas y el resto se desliza. */
+@media (max-width: 760px) {
+  .st-pos,
+  .st-team {
+    position: sticky;
+    z-index: 1;
+    background: var(--color-superficie);
+  }
+  .st-pos { left: 0; }
+  .st-team { left: 64px; box-shadow: 8px 0 8px -8px rgb(27 33 18 / 0.18); }
+  .stable__head .st-pos,
+  .stable__head .st-team { background: var(--color-noche); }
+  .stable__row.is-leader .st-pos,
+  .stable__row.is-leader .st-team { background: var(--color-dorado-claro); }
+}
 
 /* ── Ticker de resultados ───────────────────────────────────────── */
 .ticker { background: var(--color-texto); color: #fff; }
@@ -814,7 +833,7 @@
   align-items: center;
   justify-content: center;
   min-width: 48px;
-  height: 40px;
+  height: 44px;
   padding: 0 12px;
   border-radius: 8px;
   font-weight: 600;

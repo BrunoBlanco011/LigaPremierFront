@@ -19,7 +19,11 @@ export function AdminClubPlayersPage() {
 
   return (
     <>
-      <Link to="/admin/clubes" className="link-more" style={{ marginBottom: 12 }}>
+      <Link
+        to="/admin/clubes"
+        className="link-more"
+        style={{ display: 'flex', width: 'fit-content', marginBottom: 12 }}
+      >
         <ChevronLeft size={16} /> Clubes
       </Link>
       <p className="eyebrow">Plantilla del club</p>
