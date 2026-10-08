@@ -81,20 +81,20 @@
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--flag);
+  color: var(--color-texto-2);
   margin-bottom: 10px;
 }
 .eyebrow::before {
   content: '';
   width: 20px;
   height: 2px;
-  background: var(--flag);
+  background: var(--color-premier);
 }
-.page__title { font-size: clamp(28px, 5vw, 42px); }
-.page__sub { color: var(--ink-soft); margin-top: 8px; max-width: 62ch; }
+.page__title { font-size: clamp(28px, 5vw, 42px); color: var(--color-texto); }
+.page__sub { color: var(--color-texto-2); margin-top: 8px; max-width: 62ch; }
 
 /* Hero (landing) */
 .hero {
@@ -168,7 +168,7 @@
 }
 .section-head h2 { font-size: 24px; }
 .link-more {
-  color: var(--flag);
+  color: var(--color-premier);
   font-weight: 600;
   font-size: 14px;
   display: inline-flex;
@@ -276,18 +276,36 @@
 /* ── Admin / Coach shell (sidebar) ─────────────────────────────── */
 .dash {
   display: grid;
-  grid-template-columns: 248px 1fr;
+  grid-template-columns: var(--ancho-sidebar) 1fr;
   min-height: 100svh;
 }
 .sidebar {
-  background: var(--brand-800);
-  color: #fff;
+  background: var(--color-premier);
+  color: var(--color-sobre-verde);
   padding: 20px 14px;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-.sidebar__brand { margin: 4px 8px 18px; }
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 8px 18px;
+  text-decoration: none;
+  color: var(--color-sobre-verde);
+}
+.sidebar__logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: #fff;
+  object-fit: contain;
+  flex: none;
+}
+.sidebar__brand-text { display: flex; flex-direction: column; line-height: 1; }
+.sidebar__brand-name { font-size: 22px; }
+.sidebar__brand-sub { font-size: 12px; color: var(--color-sobre-verde-2); margin-top: 3px; }
 .sidebar__link {
   display: flex;
   align-items: center;
@@ -296,11 +314,29 @@
   border-radius: 10px;
   font-size: 14px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.74);
-  transition: background 0.14s, color 0.14s;
+  color: var(--color-sobre-verde-2);
+  background: transparent;
+  border: 0;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--dur-rapida), color var(--dur-rapida);
 }
-.sidebar__link:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
-.sidebar__link.is-active { background: var(--flag); color: #fff; }
+.sidebar__link:hover { background: rgb(255 255 255 / 0.08); color: #fff; }
+.sidebar__link.is-active {
+  background: var(--color-noche);
+  color: #fff;
+  box-shadow: inset 3px 0 var(--color-dorado);
+}
+.sidebar__user {
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--color-sobre-verde-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .sidebar__spacer { margin-top: auto; }
 .dash__main { padding: 28px 32px; overflow-x: auto; }
 .dash__topbar {
@@ -354,14 +390,20 @@
 /* Responsive */
 @media (max-width: 960px) {
   .grid--3, .grid--4 { grid-template-columns: repeat(2, 1fr); }
-  .dash { grid-template-columns: 1fr; }
+  .dash { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
   .sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
     flex-direction: row;
     overflow-x: auto;
     align-items: center;
     padding: 10px;
+    gap: 4px;
   }
-  .sidebar__brand, .sidebar__spacer { display: none; }
+  .sidebar__brand, .sidebar__spacer, .sidebar__user { display: none; }
+  .sidebar__link { width: auto; flex: none; white-space: nowrap; }
+  .sidebar__link.is-active { box-shadow: none; }
   .dash__main { padding: 20px; }
 }
 @media (max-width: 640px) {
