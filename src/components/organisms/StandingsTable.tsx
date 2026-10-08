@@ -2,75 +2,92 @@ import { Link } from 'react-router-dom'
 import type { StandingRow } from '@/types/api'
 import { TeamBadge } from '@/components/molecules/TeamBadge'
 
-/** Tabla de posiciones (RF-12). Reutilizable en público y admin.
- *  Con `tournamentId`, cada equipo enlaza a su perfil dentro del torneo. */
+const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `−${Math.abs(n)}` : '0')
+
+/** Tabla de posiciones v2 (RF-12): cabecera noche, columna PTS en premier,
+ *  fila del líder en dorado. Con `tournamentId`, cada equipo enlaza a su perfil. */
 export function StandingsTable({
   rows,
-  topZone = 4,
   tournamentId,
 }: {
   rows: StandingRow[]
-  topZone?: number
   tournamentId?: string
 }) {
   const teamHref = (teamId: string) =>
     tournamentId ? `/torneos/${tournamentId}/equipos/${teamId}` : undefined
+
   return (
     <>
-      <div className="table-wrap">
-        <table className="table tnum">
-          <thead>
-            <tr>
-              <th>Pos</th>
-              <th>Equipo</th>
-              <th className="num" title="Juegos jugados">JJ</th>
-              <th className="num" title="Juegos ganados">JG</th>
-              <th className="num" title="Juegos perdidos">JP</th>
-              <th className="num" title="Puntos a favor">PF</th>
-              <th className="num" title="Puntos en contra">PC</th>
-              <th className="num" title="Diferencia">Dif</th>
-              <th className="num">Pts</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.team.id} data-zone={r.position <= topZone ? 'top' : undefined}>
-                <td>
-                  <span className="pos">{r.position}</span>
-                </td>
-                <td>
-                  {teamHref(r.team.id) ? (
-                    <Link to={teamHref(r.team.id)!}>
-                      <TeamBadge name={r.team.name} logoUrl={r.team.logo_url} />
+      <div className="stable-wrap">
+        <div className="stable" role="table" aria-label="Tabla de posiciones">
+          <div className="stable__head" role="row">
+            <span className="st-pos" role="columnheader">POS.</span>
+            <span className="st-team" role="columnheader">EQUIPO</span>
+            <span role="columnheader" title="Juegos jugados">JJ</span>
+            <span role="columnheader" title="Juegos ganados">JG</span>
+            <span role="columnheader" title="Juegos perdidos">JP</span>
+            <span role="columnheader" title="Puntos a favor">PF</span>
+            <span role="columnheader" title="Puntos en contra">PC</span>
+            <span role="columnheader" title="Diferencia">DIF.</span>
+            <span className="st-pts" role="columnheader">PTS</span>
+          </div>
+          {rows.map((r) => {
+            const href = teamHref(r.team.id)
+            return (
+              <div
+                className={`stable__row${r.position === 1 ? ' is-leader' : ''}`}
+                role="row"
+                key={r.team.id}
+              >
+                <span
+                  className="ital st-pos"
+                  role="cell"
+                  style={{ color: r.position <= 3 ? 'var(--color-premier)' : 'var(--color-texto-2)' }}
+                >
+                  {r.position}
+                </span>
+                <span className="st-team" role="cell">
+                  {href ? (
+                    <Link to={href} style={{ color: 'inherit', textDecoration: 'none' }}>
+                      <TeamBadge name={r.team.name} logoUrl={r.team.logo_url} size={24} />
                     </Link>
                   ) : (
-                    <TeamBadge name={r.team.name} logoUrl={r.team.logo_url} />
+                    <TeamBadge name={r.team.name} logoUrl={r.team.logo_url} size={24} />
                   )}
-                </td>
-                <td className="num">{r.played}</td>
-                <td className="num">{r.won}</td>
-                <td className="num">{r.lost}</td>
-                <td className="num">{r.points_for}</td>
-                <td className="num">{r.points_against}</td>
-                <td className="num">{r.point_difference}</td>
-                <td className="num pts">
+                </span>
+                <span className="st-num" role="cell">{r.played}</span>
+                <span className="st-num" role="cell">{r.won}</span>
+                <span className="st-num" role="cell">{r.lost}</span>
+                <span className="st-num" role="cell">{r.points_for}</span>
+                <span className="st-num" role="cell">{r.points_against}</span>
+                <span
+                  className="st-num"
+                  role="cell"
+                  style={{
+                    fontWeight: 600,
+                    color: r.point_difference > 0 ? 'var(--color-premier)' : 'var(--color-error)',
+                  }}
+                >
+                  {signed(r.point_difference)}
+                </span>
+                <span className="marc st-pts" role="cell">
                   {r.points}
                   {r.adjustment_points !== 0 && (
                     <sup
                       title={r.adjustment_reasons.join(', ')}
-                      style={{ color: 'var(--warn)', marginLeft: 2, cursor: 'help' }}
+                      style={{ color: 'var(--color-advertencia)', fontSize: 12, cursor: 'help' }}
                     >
-                      {r.adjustment_points > 0 ? `+${r.adjustment_points}` : r.adjustment_points}*
+                      *
                     </sup>
                   )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </span>
+              </div>
+            )
+          })}
+        </div>
       </div>
-      <p className="table__note">
-        Orden: puntos → puntos a favor → diferencia → menos puntos en contra.
+      <p className="table__note" style={{ marginTop: 12, fontSize: 14, color: 'var(--color-texto-2)' }}>
+        Desempate: puntos, diferencia de puntos, puntos a favor y menos puntos en contra.
         {rows.some((r) => r.adjustment_points !== 0) && ' * Incluye ajuste manual de puntos.'}
       </p>
     </>

@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate, Link } from 'react-router-dom'
-import { Shield } from 'lucide-react'
 import { useAuth } from '@/auth/useAuth'
 import { supabaseConfigured } from '@/lib/supabase'
 import { FormField } from '@/components/molecules/FormField'
+import { PasswordField } from '@/components/molecules/PasswordField'
 import { Button } from '@/components/atoms/Button'
+import { Alert } from '@/components/molecules/Alert'
 
 interface LoginForm {
   email: string
@@ -37,51 +38,67 @@ export function LoginPage() {
   })
 
   return (
-    <div className="login-wrap">
-      <div className="login-card">
-        <div className="login-card__brand">
-          <span className="brand__mark" style={{ width: 44, height: 44 }}>
-            <Shield size={24} />
-          </span>
+    <div className="login2 sobre-verde">
+      <section className="cancha login2__aside">
+        <div className="yardas" aria-hidden="true" style={{ fontSize: 72 }}>
+          <span>10</span>
+          <span>20</span>
+          <span>30</span>
+          <span>40</span>
         </div>
-        <h1 className="login-card__title">Iniciar sesión</h1>
-        <p className="login-card__sub">Panel de administración de LigaPremier</p>
+        <Link to="/" className="login2__back">
+          ← Volver al sitio
+        </Link>
+        <div className="login2__brand">
+          <img src="/logo.png" alt="" className="login2__logo" />
+          <h2 style={{ margin: 0, display: 'flex', flexDirection: 'column' }}>
+            <span className="ital login2__brandline">Liga</span>
+            <span className="ital login2__brandline">Premier</span>
+            <span className="ital login2__brandsub">Football Flag Chiapas A.C.</span>
+          </h2>
+        </div>
+        <p className="login2__tagline">
+          Rol de juegos, resultados y tabla de posiciones de la liga, al día después de cada jornada.
+        </p>
+      </section>
 
-        {!supabaseConfigured && (
-          <div className="login-card__error">
-            Falta configurar Supabase (VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY).
+      <main className="login2__main">
+        <form className="login2__form" onSubmit={onSubmit} noValidate>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <span className="login2__eyebrow">ACCESO PARA ADMINISTRADORES Y COACHES</span>
+            <h1 className="ital login2__title">Iniciar sesión</h1>
           </div>
-        )}
-        {serverError && <div className="login-card__error">{serverError}</div>}
 
-        <form onSubmit={onSubmit} noValidate>
+          {!supabaseConfigured && (
+            <Alert tone="warning">
+              Falta configurar Supabase (VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY).
+            </Alert>
+          )}
+          {serverError && <Alert tone="danger">{serverError}</Alert>}
+
           <FormField
-            label="Correo"
+            label="Correo electrónico"
             type="email"
-            autoComplete="email"
+            autoComplete="username"
+            inputMode="email"
             placeholder="tucorreo@liga.mx"
             error={errors.email?.message}
             {...register('email', { required: 'Ingresa tu correo' })}
           />
-          <FormField
+          <PasswordField
             label="Contraseña"
-            type="password"
             autoComplete="current-password"
-            placeholder="••••••••"
             error={errors.password?.message}
             {...register('password', { required: 'Ingresa tu contraseña' })}
           />
-          <Button type="submit" variant="flag" block disabled={isSubmitting}>
-            {isSubmitting ? 'Entrando…' : 'Entrar'}
+          <Button type="submit" variant="primary" size="lg" block disabled={isSubmitting}>
+            {isSubmitting ? 'Entrando…' : 'Iniciar sesión'}
           </Button>
+          <p className="login2__hint">
+            ¿Olvidaste tu contraseña? Pídele al administrador de la liga que la restablezca.
+          </p>
         </form>
-
-        <p style={{ textAlign: 'center', marginTop: 18, fontSize: 13 }}>
-          <Link to="/" style={{ color: 'var(--ink-soft)' }}>
-            ← Volver al sitio público
-          </Link>
-        </p>
-      </div>
+      </main>
     </div>
   )
 }

@@ -3,11 +3,8 @@ import { useMemo } from 'react'
 import type { TournamentContext } from '../TournamentPage'
 import { useMatches } from '@/features/schedule/queries'
 import { MatchCard } from '@/components/organisms/MatchCard'
-import {
-  EmptyState,
-  ErrorState,
-  LoadingState,
-} from '@/components/molecules/StateView'
+import { EmptyState, ErrorState } from '@/components/molecules/StateView'
+import { MatchesSkeleton } from '@/components/molecules/Skeletons'
 
 export function ResultsTab() {
   const { tournamentId, teamsById } = useOutletContext<TournamentContext>()
@@ -23,19 +20,19 @@ export function ResultsTab() {
     [matches.data],
   )
 
-  if (matches.isLoading) return <LoadingState />
+  if (matches.isLoading) return <MatchesSkeleton count={6} />
   if (matches.isError)
-    return <ErrorState error={matches.error} onRetry={() => matches.refetch()} />
+    return <ErrorState error={matches.error} onRetry={() => matches.refetch()} resource="los resultados" />
   if (finished.length === 0)
     return (
       <EmptyState
-        title="Sin resultados todavía"
-        message="Aquí verás los marcadores conforme se jueguen los partidos."
+        title="Aún no hay resultados"
+        message="Aquí verás los partidos finalizados."
       />
     )
 
   return (
-    <div className="grid grid--2">
+    <div className="match-grid">
       {finished.map((m) => (
         <MatchCard
           key={m.id}

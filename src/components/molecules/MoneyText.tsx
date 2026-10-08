@@ -1,22 +1,23 @@
 import { formatMoney } from '@/lib/format'
 
-/** Muestra un monto MXN; resalta adeudo (>0) o saldo a favor (<0). */
+/** Muestra un monto MXN. Con `highlightDebt`, el adeudo (>0) va en rojo, el
+ *  saldo a favor (<0) en azul y el 0 "al corriente" en verde. */
 export function MoneyText({
   amount,
   highlightDebt = false,
+  label,
 }: {
   amount: string | number
   highlightDebt?: boolean
+  label?: string
 }) {
   const n = typeof amount === 'string' ? Number(amount) : amount
-  let color: string | undefined
-  if (highlightDebt) {
-    if (n > 0) color = 'var(--loss)'
-    else if (n < 0) color = 'var(--field)'
-  }
+  const kind = n > 0 ? 'debt' : n < 0 ? 'credit' : 'zero'
+  const cls = highlightDebt ? `money money--${kind}` : 'money'
   return (
-    <span className="tnum" style={{ color, fontWeight: highlightDebt ? 700 : undefined }}>
+    <span className={cls}>
       {formatMoney(amount)}
+      {label && <span className="money__label">{label}</span>}
     </span>
   )
 }

@@ -1,22 +1,194 @@
-/* ── LigaPremier · Design tokens ("Scoreboard") ────────────────── */
+/* ==========================================================================
+   LigaPremier · tokens de diseño v1
+   Ubicación: src/styles/tokens.css
+   Uso en src/index.css:
+     @import "tailwindcss";
+     @import "./styles/tokens.css";
+   Todos los pares de texto/fondo indicados cumplen WCAG AA (4.5:1).
+   ========================================================================== */
+
+@theme {
+  /* --- Marca ------------------------------------------------------------ */
+  --color-premier: #355d0d;        /* principal: navbar, sidebar, botón primario, encabezado de tabla. Blanco encima 7.7:1 */
+  --color-noche: #1f3a08;          /* hover/activo de primario, footer, ítem activo de sidebar, texto sobre dorado */
+  --color-campo: #5e8a24;          /* acentos: subrayado de pestaña activa, líneas. Nunca texto < 24px */
+  --color-dorado: #efb41b;         /* logro: líder de la tabla, campeón. Texto encima SIEMPRE noche (6.7:1) */
+  --color-dorado-oscuro: #b9860a;  /* íconos/bordes dorados sobre blanco (3.2:1, no texto) */
+  --color-dorado-texto: #8b6508;   /* texto dorado sobre blanco (5.3:1): "Líder" */
+  --color-dorado-claro: #fdf1cf;   /* fondo de la fila del líder */
+  --color-verde-claro: #e8f0dc;    /* fondo de badge Finalizado / En curso, iniciales de escudo, fila seleccionada */
+
+  /* --- Neutros ---------------------------------------------------------- */
+  --color-fondo: #f6f7f2;          /* fondo de página */
+  --color-superficie: #ffffff;     /* tarjetas, tablas, inputs, modales */
+  --color-superficie-2: #eef0ea;   /* hover de filas, deshabilitado, skeleton, badge Programado */
+  --color-borde: #dde2d3;          /* divisores y bordes decorativos */
+  --color-borde-control: #858d78;  /* borde de inputs, selects, casillas (3.5:1, requisito de controles) */
+  --color-texto: #1b2112;          /* texto principal (≥14:1) */
+  --color-texto-2: #5a6250;        /* texto secundario: fechas, sedes, coach, ayudas (6.4:1 sobre blanco) */
+  --color-sobre-verde: #ffffff;    /* texto sobre premier/noche */
+  --color-sobre-verde-2: #c9d6b5;  /* texto secundario sobre premier (5.1:1): ítems inactivos */
+  --color-velo: rgb(27 33 18 / 0.55); /* fondo detrás de modales */
+
+  /* --- Semánticos (texto sobre su fondo claro) ---------------------------- */
+  --color-exito: #355d0d;          /* victoria, Finalizado, En curso, Al corriente — sobre verde-claro */
+  --color-exito-claro: #e8f0dc;
+  --color-error: #b42318;          /* derrota, Cancelado, Adeudo, eliminar, errores — sobre error-claro (5.9:1) */
+  --color-error-claro: #fdeceb;
+  --color-advertencia: #b54708;    /* Pendiente, conflicto 409 — sobre advertencia-claro */
+  --color-advertencia-claro: #fef0e1;
+  --color-vivo: #1f5fbf;           /* En juego (con punto animado) — sobre vivo-claro */
+  --color-vivo-claro: #e8f0fb;
+  --color-info: #1f5fbf;           /* avisos informativos, saldo a favor */
+  --color-info-claro: #e8f0fb;
+  --color-forfeit: #1b2112;        /* badge Forfeit: texto blanco sobre texto (invertido) */
+
+  /* --- Tipografía --------------------------------------------------------- */
+  /* Google Fonts: "Barlow Condensed" 600/700 y "Barlow" 400/500/600/700.
+     Con Fontsource: @fontsource/barlow-condensed y @fontsource/barlow.
+     Cifras: SIEMPRE font-variant-numeric: tabular-nums (utilidad .tabular-nums). */
+  --font-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-sans: "Barlow", "Segoe UI", system-ui, sans-serif;
+
+  --text-sobretitulo: 12px;   --text-sobretitulo--line-height: 16px;  --text-sobretitulo--letter-spacing: 0.06em;  --text-sobretitulo--font-weight: 600;
+  --text-cuerpo-sm: 14px;     --text-cuerpo-sm--line-height: 20px;
+  --text-etiqueta: 14px;      --text-etiqueta--line-height: 20px;     --text-etiqueta--font-weight: 600;
+  --text-cuerpo: 16px;        --text-cuerpo--line-height: 24px;
+  --text-titulo-3: 18px;      --text-titulo-3--line-height: 24px;     --text-titulo-3--font-weight: 600;
+  --text-cifra: 22px;         --text-cifra--line-height: 24px;        --text-cifra--font-weight: 700;
+  --text-titulo-2: 26px;      --text-titulo-2--line-height: 30px;     --text-titulo-2--font-weight: 600;
+  --text-titulo-1: 36px;      --text-titulo-1--line-height: 40px;     --text-titulo-1--font-weight: 700;  --text-titulo-1--letter-spacing: -0.01em;
+  --text-display: 48px;       --text-display--line-height: 50px;      --text-display--font-weight: 700;   --text-display--letter-spacing: -0.01em;
+  --text-marcador: 56px;      --text-marcador--line-height: 56px;     --text-marcador--font-weight: 700;
+
+  /* --- Espaciado (base 4px; Tailwind ya usa --spacing: 0.25rem) ------------ */
+  /* Escala usada: 4 8 12 16 20 24 32 48 64 → p-1 p-2 p-3 p-4 p-5 p-6 p-8 p-12 p-16 */
+
+  /* --- Radios ------------------------------------------------------------- */
+  --radius-sm: 4px;    /* badges, inputs, casillas */
+  --radius-md: 8px;    /* botones, tarjetas, tablas */
+  --radius-lg: 12px;   /* modales, marcador grande */
+  --radius-full: 9999px; /* escudos, número de posición, punto En juego */
+
+  /* --- Sombras ------------------------------------------------------------ */
+  --shadow-sm: 0 1px 2px #1b21120f, 0 1px 3px #1b211214;  /* tarjetas en reposo */
+  --shadow-md: 0 4px 12px #1b21121f;                       /* hover de tarjeta enlazada */
+  --shadow-lg: 0 16px 40px -4px #1b21123d;                 /* modales, menús */
+
+  /* --- Movimiento --------------------------------------------------------- */
+  --ease-salida: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-pulso-vivo: pulso-vivo 1.6s var(--ease-salida) infinite;
+  --animate-skeleton: skeleton 1.4s ease-in-out infinite;
+
+  @keyframes pulso-vivo {
+    0% { box-shadow: 0 0 0 0 rgb(31 95 191 / 0.45); }
+    100% { box-shadow: 0 0 0 6px rgb(31 95 191 / 0); }
+  }
+  @keyframes skeleton {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+  }
+}
+
+/* Variables fuera de Tailwind (alturas, escudos, foco, duraciones) */
 :root {
-  /* Brand — stadium night */
+  --control-sm: 32px;   /* botón sm, inputs de la hoja de captura */
+  --control-md: 40px;   /* botón e input por defecto */
+  --control-lg: 48px;   /* login, acciones principales en móvil */
+  --escudo-sm: 24px;    /* tabla de posiciones, listas */
+  --escudo-md: 40px;    /* tarjeta de partido, líderes */
+  --escudo-lg: 64px;    /* tarjeta de club */
+  --escudo-xl: 96px;    /* perfil de club / equipo */
+
+  --foco: 0 0 0 2px #ffffff, 0 0 0 4px #355d0d;           /* sobre fondos claros */
+  --foco-inverso: 0 0 0 2px #1f3a08, 0 0 0 4px #efb41b;   /* sobre premier/noche */
+
+  --dur-rapida: 120ms;  /* hover, press */
+  --dur-base: 200ms;    /* tabs, menús, entrada de modal */
+  --dur-lenta: 320ms;   /* entrada de marcador y filas de tabla */
+
+  --ancho-contenido: 1200px;
+  --ancho-sidebar: 240px;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--color-fondo);
+    color: var(--color-texto);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 24px;
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible { outline: none; box-shadow: var(--foco); }
+  .sobre-verde :focus-visible { box-shadow: var(--foco-inverso); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================================================
+   Firma visual "día de juego" (v2 del diseño en Claude Design)
+   ========================================================================== */
+
+/* Franja de cancha: fondo verde con líneas de yarda, marcas laterales y franjas de pasto */
+@utility cancha {
+  background-color: var(--color-premier);
+  background-image:
+    linear-gradient(90deg, rgb(0 0 0 / 0.07) 50%, transparent 50%),
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.14) 0 2px, transparent 2px 120px),
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.22) 0 1px, transparent 1px 24px),
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.22) 0 1px, transparent 1px 24px);
+  background-size: 240px 100%, 100% 100%, 100% 10px, 100% 10px;
+  background-position: 0 0, 0 0, 0 14px, 0 calc(100% - 24px);
+  background-repeat: repeat, repeat, repeat-x, repeat-x;
+  color: #fff;
+}
+
+/* Números de yarda decorativos (siempre aria-hidden) */
+@utility yardas {
+  position: absolute; left: 0; right: 0; bottom: 34px;
+  display: flex; justify-content: space-around;
+  font-family: var(--font-display); font-style: italic; font-weight: 800;
+  font-size: 56px; line-height: 1; color: rgb(255 255 255 / 0.09);
+  pointer-events: none; user-select: none;
+}
+
+/* Etiqueta inclinada (mismo ángulo que el swoosh del logo). El texto va en un <span> hijo */
+@utility tag {
+  display: inline-flex; align-items: center; transform: skewX(-12deg);
+  background: var(--color-dorado); color: var(--color-noche);
+  padding: 4px 12px; font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.08em;
+  & > span { transform: skewX(12deg); }
+}
+@utility tag-oscura { background: var(--color-noche); color: #fff; }
+
+/* Títulos itálicos del logo y cifras de marcador */
+@utility ital { font-family: var(--font-display); font-style: italic; font-weight: 800; letter-spacing: -0.01em; text-transform: uppercase; }
+@utility marc { font-family: var(--font-display); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* ==========================================================================
+   Compat v1: tokens heredados que los componentes aún usan.
+   Se irán eliminando conforme las pantallas migren al sistema v2 (@theme).
+   (No se redefine --font-* ni --shadow-*: gana el sistema v2.)
+   ========================================================================== */
+:root {
   --brand-900: #0a0f20;
   --brand-800: #0e1730;
   --brand-700: #172142;
   --brand-600: #223057;
   --brand-300: #7c88a8;
-
-  /* Signature accent — flag */
   --flag: #ff4d2e;
   --flag-600: #e63b1e;
   --flag-050: #fff1ee;
-
-  /* Field green — positives / wins */
   --field: #16a34a;
   --field-050: #e9f7ef;
-
-  /* Neutrals */
   --bg: #f6f7fb;
   --surface: #ffffff;
   --surface-2: #f1f3f9;
@@ -24,35 +196,12 @@
   --ink-soft: #5b6478;
   --ink-faint: #8a92a6;
   --line: #e5e8f0;
-
-  /* Semantics */
   --win: #16a34a;
   --loss: #e11d48;
   --draw: #94a3b8;
   --live: #e11d48;
   --warn: #d97706;
-
-  /* Radius & shadow */
   --r-sm: 8px;
   --r: 14px;
   --r-lg: 20px;
-  --shadow-sm: 0 1px 2px rgba(14, 23, 48, 0.06);
-  --shadow-md: 0 10px 30px rgba(14, 23, 48, 0.08);
-  --shadow-lg: 0 24px 60px rgba(14, 23, 48, 0.16);
-
-  /* Type */
-  --font-display: 'Space Grotesk Variable', system-ui, sans-serif;
-  --font-sans: 'Inter Variable', system-ui, sans-serif;
-
-  /* Spacing scale */
-  --sp-1: 4px;
-  --sp-2: 8px;
-  --sp-3: 12px;
-  --sp-4: 16px;
-  --sp-5: 24px;
-  --sp-6: 32px;
-  --sp-7: 48px;
-  --sp-8: 64px;
-
-  color-scheme: light;
 }

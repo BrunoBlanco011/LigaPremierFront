@@ -1,7 +1,14 @@
-@import '@fontsource-variable/space-grotesk';
-@import '@fontsource-variable/inter';
-@import './styles/tokens.css';
+@import '@fontsource/barlow/400.css';
+@import '@fontsource/barlow/500.css';
+@import '@fontsource/barlow/600.css';
+@import '@fontsource/barlow/700.css';
+@import '@fontsource/barlow-condensed/600.css';
+@import '@fontsource/barlow-condensed/700.css';
+@import '@fontsource/barlow-condensed/800.css';
+@import '@fontsource/barlow-condensed/700-italic.css';
+@import '@fontsource/barlow-condensed/800-italic.css';
 @import 'tailwindcss';
+@import './styles/tokens.css';
 @import './styles/components.css';
 @import './styles/layout.css';
 
@@ -16,8 +23,8 @@ html {
 
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--ink);
+  background: var(--color-fondo);
+  color: var(--color-texto);
   font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.5;
@@ -33,9 +40,21 @@ h4 {
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: -0.02em;
-  color: var(--ink);
+  color: var(--color-texto);
   margin: 0;
   line-height: 1.08;
+}
+
+/* Sobre la franja de cancha o fondos de marca, los títulos siguen el color claro. */
+.cancha h1,
+.cancha h2,
+.cancha h3,
+.cancha h4,
+.sobre-verde h1,
+.sobre-verde h2,
+.sobre-verde h3,
+.sobre-verde h4 {
+  color: inherit;
 }
 
 a {

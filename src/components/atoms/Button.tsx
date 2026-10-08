@@ -1,6 +1,14 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
-type Variant = 'primary' | 'flag' | 'outline' | 'ghost' | 'danger'
+type Variant =
+  | 'primary'
+  | 'secondary'
+  | 'star'
+  | 'ghost'
+  | 'danger'
+  /** alias heredados: flag → star, outline → secondary */
+  | 'flag'
+  | 'outline'
 type Size = 'sm' | 'md' | 'lg'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
