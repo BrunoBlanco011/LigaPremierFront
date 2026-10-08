@@ -1,4 +1,5 @@
-import { NavLink } from 'react-router-dom'
+import { useLayoutEffect, useRef, useState } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
 
 export interface TabItem {
   to: string
@@ -6,10 +7,22 @@ export interface TabItem {
   end?: boolean
 }
 
-/** Navegación por pestañas basada en rutas (RF-11). */
+/** Navegación por pestañas basada en rutas (RF-11). El indicador inferior se
+ *  desliza a la pestaña activa (A1); instantáneo con movimiento reducido. */
 export function TabNav({ tabs }: { tabs: TabItem[] }) {
+  const navRef = useRef<HTMLElement>(null)
+  const location = useLocation()
+  const [ind, setInd] = useState<{ x: number; w: number } | null>(null)
+
+  useLayoutEffect(() => {
+    const nav = navRef.current
+    if (!nav) return
+    const active = nav.querySelector<HTMLElement>('.tab.is-active')
+    if (active) setInd({ x: active.offsetLeft, w: active.offsetWidth })
+  }, [location.pathname, tabs])
+
   return (
-    <nav className="tabs">
+    <nav className="tabs" ref={navRef}>
       {tabs.map((t) => (
         <NavLink
           key={t.to}
@@ -20,6 +33,13 @@ export function TabNav({ tabs }: { tabs: TabItem[] }) {
           {t.label}
         </NavLink>
       ))}
+      {ind && (
+        <span
+          className="tab__ind"
+          aria-hidden="true"
+          style={{ transform: `translateX(${ind.x}px)`, width: ind.w }}
+        />
+      )}
     </nav>
   )
 }

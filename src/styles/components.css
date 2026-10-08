@@ -271,6 +271,24 @@ textarea.input { height: auto; min-height: 96px; padding: 8px 12px; resize: vert
   border: 0;
 }
 
+/* ── Animaciones de entrada (solo al montar; nunca en refetch) ──── */
+/* Con prefers-reduced-motion la regla global las vuelve instantáneas. */
+@keyframes enter-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes enter-up-sm { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes enter-fade { from { opacity: 0; } to { opacity: 1; } }
+.enter-up {
+  animation: enter-up 0.32s var(--ease-salida) both;
+  animation-delay: var(--enter-delay, 0s);
+}
+.enter-up-sm {
+  animation: enter-up-sm 0.24s var(--ease-salida) both;
+  animation-delay: var(--enter-delay, 0s);
+}
+.enter-fade {
+  animation: enter-fade 0.32s var(--ease-salida) both;
+  animation-delay: var(--enter-delay, 0s);
+}
+
 /* ── Skeleton (carga con la forma del contenido) ───────────────── */
 .sk {
   background: var(--color-superficie-2);
@@ -313,8 +331,9 @@ textarea.input { height: auto; min-height: 96px; padding: 8px 12px; resize: vert
 .card--pad { padding: 20px; }
 
 /* ── Tabs ──────────────────────────────────────────────────────── */
-.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--color-borde); overflow-x: auto; scrollbar-width: none; background: var(--color-superficie); padding: 0 8px; }
+.tabs { position: relative; display: flex; gap: 4px; border-bottom: 1px solid var(--color-borde); overflow-x: auto; scrollbar-width: none; background: var(--color-superficie); padding: 0 8px; }
 .tab {
+  position: relative;
   font: inherit;
   font-size: 14px;
   font-weight: 600;
@@ -326,10 +345,24 @@ textarea.input { height: auto; min-height: 96px; padding: 8px 12px; resize: vert
   margin-bottom: -1px;
   cursor: pointer;
   white-space: nowrap;
+  transition: color var(--dur-rapida) var(--ease-salida);
 }
 .tab:hover { color: var(--color-texto); }
 .tab.is-active,
-.tab[aria-selected='true'] { color: var(--color-premier); border-bottom-color: var(--color-campo); }
+.tab[aria-selected='true'] { color: var(--color-premier); }
+/* Indicador deslizante medido por JS (TabNav). En pestañas sin él
+   (aria-selected) cae un subrayado estático. */
+.tab__ind {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 3px;
+  border-radius: 2px 2px 0 0;
+  background: var(--color-campo);
+  transition: transform var(--dur-base) var(--ease-salida),
+    width var(--dur-base) var(--ease-salida);
+}
+.tab[aria-selected='true'] { border-bottom-color: var(--color-campo); }
 
 /* ── Modal / Dialog ────────────────────────────────────────────── */
 .modal-overlay { position: fixed; inset: 0; background: var(--color-velo); display: grid; place-items: center; padding: 16px; z-index: 50; }
