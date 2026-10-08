@@ -79,6 +79,7 @@
   --ease-salida: cubic-bezier(0.22, 1, 0.36, 1);
   --animate-pulso-vivo: pulso-vivo 1.6s var(--ease-salida) infinite;
   --animate-skeleton: skeleton 1.4s ease-in-out infinite;
+  --animate-giro-balon: giro-balon 1s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 
   @keyframes pulso-vivo {
     0% { box-shadow: 0 0 0 0 rgb(31 95 191 / 0.45); }
@@ -87,6 +88,10 @@
   @keyframes skeleton {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.55; }
+  }
+  @keyframes giro-balon {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
 }
 

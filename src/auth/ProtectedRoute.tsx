@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import type { UserRole } from '@/types/api'
 import { useAuth } from './useAuth'
-import { Spinner } from '@/components/atoms/Spinner'
+import { FootballSpinner } from '@/components/atoms/FootballSpinner'
 
 /** Guard por rol: bloquea /admin/* y /coach/* (RF §1.1). */
 export function ProtectedRoute({ role }: { role: UserRole }) {
@@ -10,8 +10,17 @@ export function ProtectedRoute({ role }: { role: UserRole }) {
 
   if (loading) {
     return (
-      <div style={{ display: 'grid', placeItems: 'center', minHeight: '60vh' }}>
-        <Spinner />
+      <div
+        style={{
+          display: 'grid',
+          placeItems: 'center',
+          gap: 12,
+          minHeight: '60vh',
+          color: 'var(--color-texto-2)',
+        }}
+      >
+        <FootballSpinner size="xl" label="" />
+        <span style={{ fontSize: 14 }}>Cargando…</span>
       </div>
     )
   }

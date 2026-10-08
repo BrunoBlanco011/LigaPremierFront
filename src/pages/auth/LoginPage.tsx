@@ -91,7 +91,7 @@ export function LoginPage() {
             error={errors.password?.message}
             {...register('password', { required: 'Ingresa tu contraseña' })}
           />
-          <Button type="submit" variant="primary" size="lg" block disabled={isSubmitting}>
+          <Button type="submit" variant="primary" size="lg" block loading={isSubmitting}>
             {isSubmitting ? 'Entrando…' : 'Iniciar sesión'}
           </Button>
           <p className="login2__hint">

@@ -23,9 +23,13 @@
   cursor: pointer;
   white-space: nowrap;
   text-decoration: none;
-  transition: background var(--dur-rapida) var(--ease-salida, ease);
+  transition: background var(--dur-rapida) var(--ease-salida, ease),
+    transform var(--dur-rapida) var(--ease-salida, ease);
 }
-.btn:disabled {
+.btn:active:not(:disabled) { transform: scale(0.98); }
+/* Cargando: conserva el color de la variante (no se ve deshabilitado). */
+.btn[aria-busy='true'] { cursor: progress; opacity: 0.9; }
+.btn:disabled:not([aria-busy='true']) {
   cursor: not-allowed;
   background: var(--color-superficie-2);
   border-color: var(--color-borde);
@@ -198,18 +202,6 @@ textarea.input { height: auto; min-height: 96px; padding: 8px 12px; resize: vert
   font-size: 14px;
   font-weight: 600;
 }
-
-/* ── Spinner ───────────────────────────────────────────────────── */
-.spinner {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 2.5px solid var(--color-borde);
-  border-top-color: var(--color-premier);
-  animation: spin 0.7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 1.4s; } }
 
 /* ── Estados (cargando / vacío / error) ────────────────────────── */
 .state {
