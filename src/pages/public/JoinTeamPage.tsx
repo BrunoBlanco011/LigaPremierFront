@@ -146,7 +146,7 @@ export function JoinTeamPage() {
         <Button type="submit" variant="primary" size="lg" block disabled={isSubmitting}>
           {isSubmitting ? 'Registrando…' : `Unirme a ${club.name}`}
         </Button>
-        <p className="join2__expiry">Este link vence el {formatDateTime(invite.data.expires_at)}.</p>
+        <p className="join2__expiry">Este link vence el {formatDateTime(invite.data.expires_at)}</p>
       </form>
     </div>
   )
