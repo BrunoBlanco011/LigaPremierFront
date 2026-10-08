@@ -28,3 +28,6 @@ ACCESO.local.md
 
 # Config local de Claude Code (no versionar)
 .claude/settings.local.json
+
+# Playwright MCP run artifacts
+.playwright-mcp/

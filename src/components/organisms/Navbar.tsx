@@ -1,50 +1,73 @@
+import { useState } from 'react'
 import { NavLink, Link } from 'react-router-dom'
-import { Shield } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { useAuth } from '@/auth/useAuth'
 
-const links = [
-  { to: '/', label: 'Torneos', end: true },
+const LINKS = [
+  { to: '/', label: 'Inicio', end: true },
   { to: '/clubes', label: 'Clubes', end: false },
 ]
 
 export function Navbar() {
   const { user } = useAuth()
+  const [open, setOpen] = useState(false)
+  const panel = user ? (user.role === 'admin' ? '/admin' : '/coach') : null
+
+  const linkClass = ({ isActive }: { isActive: boolean }) =>
+    `nav2__link${isActive ? ' is-active' : ''}`
+
   return (
-    <header className="nav">
-      <div className="container nav__inner">
-        <Link to="/" className="brand">
-          <span className="brand__mark">
-            <Shield size={18} />
+    <header className="nav2 sobre-verde">
+      <div className="nav2__inner">
+        <Link to="/" className="nav2__brand">
+          <img src="/logo.png" alt="Liga Premier Football Flag Chiapas" className="nav2__logo" />
+          <span className="nav2__brand-text">
+            <span className="ital nav2__brand-name">Liga Premier</span>
+            <span className="nav2__brand-sub">Football Flag Chiapas</span>
           </span>
-          Liga<em style={{ color: 'var(--flag)', fontStyle: 'normal' }}>Premier</em>
         </Link>
-        <nav className="nav__links">
-          {links.map((l) => (
+
+        <nav aria-label="Principal" className="nav2__nav">
+          {LINKS.map((l) => (
+            <NavLink key={l.to} to={l.to} end={l.end} className={linkClass}>
+              {l.label}
+            </NavLink>
+          ))}
+        </nav>
+
+        <Link to={panel ?? '/login'} className="nav2__login">
+          {panel ? 'Mi panel' : 'Iniciar sesión'}
+        </Link>
+
+        <button
+          type="button"
+          className="nav2__burger"
+          aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+        >
+          {open ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
+      {open && (
+        <nav aria-label="Principal" className="nav2__menu">
+          {LINKS.map((l) => (
             <NavLink
               key={l.to}
               to={l.to}
               end={l.end}
-              className={({ isActive }) =>
-                `nav__link${isActive ? ' is-active' : ''}`
-              }
+              className={linkClass}
+              onClick={() => setOpen(false)}
             >
               {l.label}
             </NavLink>
           ))}
-          {user ? (
-            <NavLink
-              to={user.role === 'admin' ? '/admin' : '/coach'}
-              className="nav__link"
-            >
-              Mi panel
-            </NavLink>
-          ) : (
-            <NavLink to="/login" className="nav__link">
-              Iniciar sesión
-            </NavLink>
-          )}
+          <Link to={panel ?? '/login'} className="nav2__login" onClick={() => setOpen(false)}>
+            {panel ? 'Mi panel' : 'Iniciar sesión'}
+          </Link>
         </nav>
-      </div>
+      )}
     </header>
   )
 }
