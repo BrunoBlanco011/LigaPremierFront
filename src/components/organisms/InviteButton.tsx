@@ -30,13 +30,13 @@ export function InviteButton({ clubId }: { clubId: string }) {
 
   return (
     <>
-      <Button variant="outline" onClick={open} disabled={create.isPending}>
+      <Button variant="outline" onClick={open} loading={create.isPending}>
         <Link2 size={16} /> {create.isPending ? 'Generando…' : 'Generar link de invitación'}
       </Button>
 
       {invite && (
         <Modal title="Link de invitación" onClose={() => setInvite(null)}>
-          <p style={{ color: 'var(--ink-soft)', fontSize: 14, marginBottom: 14 }}>
+          <p style={{ color: 'var(--color-texto-2)', fontSize: 14, marginBottom: 14 }}>
             Comparte este link con tus jugadores para que se den de alta solos en
             el club. Expira el <strong>{formatDateTime(invite.expires_at)}</strong>.
           </p>

@@ -1,3 +1,6 @@
+import { FootballSpinner } from './FootballSpinner'
+
+/** Alias retrocompatible: todos los spinners son el balón de americano. */
 export function Spinner({ label = 'Cargando…' }: { label?: string }) {
-  return <span className="spinner" role="status" aria-label={label} />
+  return <FootballSpinner size="md" tone="marca" label={label} />
 }

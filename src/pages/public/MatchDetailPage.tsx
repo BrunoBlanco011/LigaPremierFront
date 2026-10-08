@@ -195,9 +195,16 @@ export function MatchDetailPage() {
             <div className="marc sb__score">
               {played ? (
                 <>
-                  <span style={{ opacity: homeWon ? 1 : 0.6 }}>{m.home_score ?? 0}</span>
+                  <span className="enter-up" style={{ display: 'inline-block' }}>
+                    <span style={{ opacity: homeWon ? 1 : 0.6 }}>{m.home_score ?? 0}</span>
+                  </span>
                   <span style={{ opacity: 0.6 }}> – </span>
-                  <span style={{ opacity: awayWon ? 1 : 0.6 }}>{m.away_score ?? 0}</span>
+                  <span
+                    className="enter-up"
+                    style={{ display: 'inline-block', animationDelay: '0.06s' }}
+                  >
+                    <span style={{ opacity: awayWon ? 1 : 0.6 }}>{m.away_score ?? 0}</span>
+                  </span>
                 </>
               ) : (
                 'VS'

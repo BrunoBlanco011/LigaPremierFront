@@ -1,5 +1,5 @@
 import { useOutletContext } from 'react-router-dom'
-import { useMemo } from 'react'
+import { useMemo, type CSSProperties } from 'react'
 import type { TournamentContext } from '../TournamentPage'
 import { useMatches } from '@/features/schedule/queries'
 import { MatchCard } from '@/components/organisms/MatchCard'
@@ -33,14 +33,19 @@ export function ResultsTab() {
 
   return (
     <div className="match-grid">
-      {finished.map((m) => (
-        <MatchCard
+      {finished.map((m, i) => (
+        <div
           key={m.id}
-          match={m}
-          home={teamsById.get(m.home_team_id)}
-          away={teamsById.get(m.away_team_id)}
-          linkTo={`/torneos/${tournamentId}/partidos/${m.id}`}
-        />
+          className="enter-up"
+          style={{ '--enter-delay': `${Math.min(i, 5) * 0.04}s` } as CSSProperties}
+        >
+          <MatchCard
+            match={m}
+            home={teamsById.get(m.home_team_id)}
+            away={teamsById.get(m.away_team_id)}
+            linkTo={`/torneos/${tournamentId}/partidos/${m.id}`}
+          />
+        </div>
       ))}
     </div>
   )

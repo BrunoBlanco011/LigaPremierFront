@@ -1,5 +1,5 @@
 import { useOutletContext } from 'react-router-dom'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 import type { Match, Round } from '@/types/api'
 import type { TournamentContext } from '../TournamentPage'
 import { useMatches, useRounds } from '@/features/schedule/queries'
@@ -123,22 +123,33 @@ export function ScheduleTab() {
       {daySections.length === 0 ? (
         <p style={{ color: 'var(--color-texto-2)' }}>Sin partidos en esta jornada.</p>
       ) : (
-        daySections.map((d) => (
-          <section key={d.title} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <h3 className="day-head">{d.title}</h3>
-            <div className="match-grid">
-              {d.matches.map((m) => (
-                <MatchCard
-                  key={m.id}
-                  match={m}
-                  home={teamsById.get(m.home_team_id)}
-                  away={teamsById.get(m.away_team_id)}
-                  linkTo={`/torneos/${tournamentId}/partidos/${m.id}`}
-                />
-              ))}
-            </div>
-          </section>
-        ))
+        (() => {
+          let n = 0 // índice plano de la jornada para escalonar (máx. 6)
+          return daySections.map((d) => (
+            <section key={d.title} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <h3 className="day-head">{d.title}</h3>
+              <div className="match-grid">
+                {d.matches.map((m) => {
+                  const i = n++
+                  return (
+                    <div
+                      key={m.id}
+                      className="enter-up"
+                      style={{ '--enter-delay': `${Math.min(i, 5) * 0.04}s` } as CSSProperties}
+                    >
+                      <MatchCard
+                        match={m}
+                        home={teamsById.get(m.home_team_id)}
+                        away={teamsById.get(m.away_team_id)}
+                        linkTo={`/torneos/${tournamentId}/partidos/${m.id}`}
+                      />
+                    </div>
+                  )
+                })}
+              </div>
+            </section>
+          ))
+        })()
       )}
     </>
   )

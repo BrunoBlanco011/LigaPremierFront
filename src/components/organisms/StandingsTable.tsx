@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import type { CSSProperties } from 'react'
 import type { StandingRow } from '@/types/api'
 import { TeamBadge } from '@/components/molecules/TeamBadge'
 
@@ -31,13 +32,14 @@ export function StandingsTable({
             <span role="columnheader" title="Diferencia">DIF.</span>
             <span className="st-pts" role="columnheader">PTS</span>
           </div>
-          {rows.map((r) => {
+          {rows.map((r, i) => {
             const href = teamHref(r.team.id)
             return (
               <div
-                className={`stable__row${r.position === 1 ? ' is-leader' : ''}`}
+                className={`stable__row enter-up-sm${r.position === 1 ? ' is-leader' : ''}`}
                 role="row"
                 key={r.team.id}
+                style={{ '--enter-delay': `${Math.min(i, 11) * 0.025}s` } as CSSProperties}
               >
                 <span
                   className="ital st-pos"
@@ -65,7 +67,12 @@ export function StandingsTable({
                   role="cell"
                   style={{
                     fontWeight: 600,
-                    color: r.point_difference > 0 ? 'var(--color-premier)' : 'var(--color-error)',
+                    color:
+                      r.point_difference > 0
+                        ? 'var(--color-premier)'
+                        : r.point_difference < 0
+                          ? 'var(--color-error)'
+                          : 'var(--color-texto-2)',
                   }}
                 >
                   {signed(r.point_difference)}

@@ -10,7 +10,7 @@ import { JerseyPreview } from '@/components/molecules/JerseyPreview'
 import { FormField } from '@/components/molecules/FormField'
 import { Button } from '@/components/atoms/Button'
 import { Alert } from '@/components/molecules/Alert'
-import { Spinner } from '@/components/atoms/Spinner'
+import { FootballSpinner } from '@/components/atoms/FootballSpinner'
 import { formatDateTime } from '@/lib/format'
 
 interface FormValues {
@@ -59,7 +59,7 @@ export function JoinTeamPage() {
     return (
       <div className="join2">
         <div className="join2__state">
-          <Spinner />
+          <FootballSpinner size="lg" />
         </div>
       </div>
     )
@@ -92,11 +92,17 @@ export function JoinTeamPage() {
           <h1 className="ital join2__title">¡Listo, {done}!</h1>
         </section>
         <div className="join2__card" style={{ textAlign: 'center', alignItems: 'center' }}>
-          <CheckCircle2 size={44} color="var(--color-premier)" />
-          <p className="join2__hint">
+          <CheckCircle2 size={44} color="var(--color-premier)" className="enter-up" />
+          <p className="join2__hint enter-fade" style={{ animationDelay: '0.12s' }}>
             Quedaste registrado en <strong>{club.name}</strong>. Tu coach ya te verá en el roster.
           </p>
-          <Link to="/" className="btn btn--primary btn--block">Ir al inicio</Link>
+          <Link
+            to="/"
+            className="btn btn--primary btn--block enter-fade"
+            style={{ animationDelay: '0.18s' }}
+          >
+            Ir al inicio
+          </Link>
         </div>
       </div>
     )
@@ -143,7 +149,7 @@ export function JoinTeamPage() {
             setJersey(e.target.value)
           }}
         />
-        <Button type="submit" variant="primary" size="lg" block disabled={isSubmitting}>
+        <Button type="submit" variant="primary" size="lg" block loading={isSubmitting}>
           {isSubmitting ? 'Registrando…' : `Unirme a ${club.name}`}
         </Button>
         <p className="join2__expiry">Este link vence el {formatDateTime(invite.data.expires_at)}</p>

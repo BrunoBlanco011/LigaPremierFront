@@ -79,6 +79,7 @@
   --ease-salida: cubic-bezier(0.22, 1, 0.36, 1);
   --animate-pulso-vivo: pulso-vivo 1.6s var(--ease-salida) infinite;
   --animate-skeleton: skeleton 1.4s ease-in-out infinite;
+  --animate-giro-balon: giro-balon 1s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 
   @keyframes pulso-vivo {
     0% { box-shadow: 0 0 0 0 rgb(31 95 191 / 0.45); }
@@ -87,6 +88,10 @@
   @keyframes skeleton {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.55; }
+  }
+  @keyframes giro-balon {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
 }
 
@@ -128,8 +133,10 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
   }
 }
 
@@ -174,34 +181,34 @@
 @utility marc { font-family: var(--font-display); font-weight: 700; font-variant-numeric: tabular-nums; }
 
 /* ==========================================================================
-   Compat v1: tokens heredados que los componentes aún usan.
-   Se irán eliminando conforme las pantallas migren al sistema v2 (@theme).
-   (No se redefine --font-* ni --shadow-*: gana el sistema v2.)
+   Compat v1: alias de los tokens heredados a los de marca (@theme). Así
+   cualquier uso restante (estilos en línea, CSS no migrado) queda en la paleta
+   de la liga. (No se redefine --font-* ni --shadow-*: gana el sistema v2.)
    ========================================================================== */
 :root {
-  --brand-900: #0a0f20;
-  --brand-800: #0e1730;
-  --brand-700: #172142;
-  --brand-600: #223057;
-  --brand-300: #7c88a8;
-  --flag: #ff4d2e;
-  --flag-600: #e63b1e;
-  --flag-050: #fff1ee;
-  --field: #16a34a;
-  --field-050: #e9f7ef;
-  --bg: #f6f7fb;
-  --surface: #ffffff;
-  --surface-2: #f1f3f9;
-  --ink: #0e1730;
-  --ink-soft: #5b6478;
-  --ink-faint: #8a92a6;
-  --line: #e5e8f0;
-  --win: #16a34a;
-  --loss: #e11d48;
-  --draw: #94a3b8;
-  --live: #e11d48;
-  --warn: #d97706;
-  --r-sm: 8px;
-  --r: 14px;
-  --r-lg: 20px;
+  --brand-900: var(--color-noche);
+  --brand-800: var(--color-premier);
+  --brand-700: var(--color-campo);
+  --brand-600: var(--color-campo);
+  --brand-300: var(--color-sobre-verde-2);
+  --flag: var(--color-premier);
+  --flag-600: var(--color-noche);
+  --flag-050: var(--color-verde-claro);
+  --field: var(--color-exito);
+  --field-050: var(--color-exito-claro);
+  --bg: var(--color-fondo);
+  --surface: var(--color-superficie);
+  --surface-2: var(--color-superficie-2);
+  --ink: var(--color-texto);
+  --ink-soft: var(--color-texto-2);
+  --ink-faint: var(--color-texto-2);
+  --line: var(--color-borde);
+  --win: var(--color-exito);
+  --loss: var(--color-error);
+  --draw: var(--color-texto-2);
+  --live: var(--color-vivo);
+  --warn: var(--color-advertencia);
+  --r-sm: var(--radius-sm);
+  --r: var(--radius-md);
+  --r-lg: var(--radius-lg);
 }

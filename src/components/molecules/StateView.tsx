@@ -1,14 +1,21 @@
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { Spinner } from '@/components/atoms/Spinner'
+import { FootballSpinner } from '@/components/atoms/FootballSpinner'
 import { ApiError, friendlyMessage } from '@/lib/errors'
 
-/** Estado de carga simple (spinner). Para datos, prefiere un skeleton con la
- *  forma del contenido (ver molecules/Skeletons). */
+/** Estado de carga para secciones sin forma predecible: el balón (xl) con
+ *  "Cargando…" debajo. Aparece solo si la carga pasa de 300ms, para no
+ *  parpadear. Para tablas y listas, usa un skeleton (ver molecules/Skeletons). */
 export function LoadingState({ label = 'Cargando…' }: { label?: string }) {
+  const [shown, setShown] = useState(false)
+  useEffect(() => {
+    const t = setTimeout(() => setShown(true), 300)
+    return () => clearTimeout(t)
+  }, [])
+  if (!shown) return <div className="state" aria-busy="true" />
   return (
     <div className="state" aria-busy="true">
-      <Spinner />
+      <FootballSpinner size="xl" label="" />
       <span>{label}</span>
     </div>
   )
