@@ -31,3 +31,13 @@ ACCESO.local.md
 
 # Playwright MCP run artifacts
 .playwright-mcp/
+
+# Artefactos de diseño: referencia del lienzo y capturas de verificación
+/diseno/
+
+# Capturas sueltas y notas de trabajo
+/fase1-*.png
+/fase2-*.png
+/IMPLEMENTAR_DESING.md
+/PULIRDISENO.md
+/PULIRDISENO_md
