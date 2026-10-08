@@ -92,11 +92,17 @@ export function JoinTeamPage() {
           <h1 className="ital join2__title">¡Listo, {done}!</h1>
         </section>
         <div className="join2__card" style={{ textAlign: 'center', alignItems: 'center' }}>
-          <CheckCircle2 size={44} color="var(--color-premier)" />
-          <p className="join2__hint">
+          <CheckCircle2 size={44} color="var(--color-premier)" className="enter-up" />
+          <p className="join2__hint enter-fade" style={{ animationDelay: '0.12s' }}>
             Quedaste registrado en <strong>{club.name}</strong>. Tu coach ya te verá en el roster.
           </p>
-          <Link to="/" className="btn btn--primary btn--block">Ir al inicio</Link>
+          <Link
+            to="/"
+            className="btn btn--primary btn--block enter-fade"
+            style={{ animationDelay: '0.18s' }}
+          >
+            Ir al inicio
+          </Link>
         </div>
       </div>
     )

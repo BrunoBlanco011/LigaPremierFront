@@ -20,6 +20,7 @@ export function JerseyPreview({
       viewBox="0 0 200 200"
       role="img"
       aria-label={label}
+      className={error ? 'jersey-shake' : undefined}
     >
       <path
         d="M62 18 L40 26 L8 58 L32 92 L48 80 L48 186 L152 186 L152 80 L168 92 L192 58 L160 26 L138 18 C130 34 116 42 100 42 C84 42 70 34 62 18 Z"
@@ -36,6 +37,8 @@ export function JerseyPreview({
       />
       {hasNumber && (
         <text
+          key={String(number)}
+          className="jersey-num"
           x="100"
           y="146"
           textAnchor="middle"
