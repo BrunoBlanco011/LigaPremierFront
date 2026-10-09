@@ -1,7 +1,7 @@
 import { ApiError } from './errors'
 import { supabase } from './supabase'
 
-const BASE = `${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}/api/v1`
+export const BASE = `${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}/api/v1`
 
 type Query = Record<string, string | number | boolean | undefined | null>
 

@@ -3,6 +3,7 @@ import { PublicLayout } from '@/components/templates/PublicLayout'
 import { AdminLayout } from '@/components/templates/AdminLayout'
 import { CoachLayout } from '@/components/templates/CoachLayout'
 import { ProtectedRoute } from '@/auth/ProtectedRoute'
+import { useRealtimeUpdates } from '@/lib/realtime'
 
 import { HomePage } from '@/pages/public/HomePage'
 import { TournamentPage } from '@/pages/public/TournamentPage'
@@ -28,6 +29,9 @@ import { CoachHomePage } from '@/pages/coach/CoachHomePage'
 import { CoachRosterPage } from '@/pages/coach/CoachRosterPage'
 
 export default function App() {
+  // Refresca lo que esté en pantalla cuando alguien cambia datos (WebSocket)
+  useRealtimeUpdates()
+
   return (
     <Routes>
       {/* Sitio público */}
