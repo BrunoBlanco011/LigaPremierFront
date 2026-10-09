@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { api } from '@/lib/api'
+import { api, saveFile } from '@/lib/api'
 import type { Match, MatchStatus } from '@/types/api'
 
 export interface MatchInput {
@@ -70,5 +70,13 @@ export function useForfeit(tournamentId: string) {
         forfeit_loser_team_id: loserTeamId,
       }),
     onSuccess: () => invalidate(qc, tournamentId),
+  })
+}
+
+/** Descarga la cédula de referees (Excel) con la plantilla de jugadores de ambos equipos. */
+export function useDownloadRefereeSheet() {
+  return useMutation({
+    mutationFn: async (matchId: string) =>
+      saveFile(await api.download(`/matches/${matchId}/referee-sheet`), 'cedula.xlsx'),
   })
 }
