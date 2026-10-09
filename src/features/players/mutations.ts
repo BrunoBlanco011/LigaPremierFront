@@ -6,6 +6,7 @@ import { clubKeys } from '@/features/clubs/queries'
 export interface PlayerInput {
   full_name: string
   jersey_number?: number | null
+  birth_date?: string | null
 }
 
 /** RF-41: la plantilla es del club. */
