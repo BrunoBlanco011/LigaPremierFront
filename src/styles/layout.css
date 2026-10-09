@@ -350,7 +350,16 @@
   white-space: nowrap;
 }
 .sidebar__spacer { margin-top: auto; }
-.dash__main { padding: 28px 32px; overflow-x: auto; }
+/* El área de contenido ocupa el ancho disponible, pero su contenido se limita
+   a un ancho cómodo y se centra: en pantallas grandes no se estira ni queda
+   disperso; el resto es el fondo de la página. */
+.dash__main {
+  width: 100%;
+  max-width: var(--ancho-panel);
+  margin-inline: auto;
+  padding: 28px 32px;
+  overflow-x: auto;
+}
 .dash__topbar {
   display: flex;
   align-items: center;

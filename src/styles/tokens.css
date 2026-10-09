@@ -112,7 +112,8 @@
   --dur-base: 200ms;    /* tabs, menús, entrada de modal */
   --dur-lenta: 320ms;   /* entrada de marcador y filas de tabla */
 
-  --ancho-contenido: 1200px;
+  --ancho-contenido: 1200px;   /* contenido del sitio público */
+  --ancho-panel: 1440px;       /* contenido de los paneles admin/coach */
   --ancho-sidebar: 240px;
 }
 
