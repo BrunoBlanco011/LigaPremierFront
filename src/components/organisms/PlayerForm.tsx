@@ -9,6 +9,7 @@ import {
 import { ApiError, friendlyMessage } from '@/lib/errors'
 import { Modal } from '@/components/molecules/Modal'
 import { FormField } from '@/components/molecules/FormField'
+import { JerseyPreview } from '@/components/molecules/JerseyPreview'
 import { Button } from '@/components/atoms/Button'
 
 interface FormValues {
@@ -35,6 +36,7 @@ export function PlayerForm({
     register,
     handleSubmit,
     setError,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     defaultValues: {
@@ -42,6 +44,8 @@ export function PlayerForm({
       jersey_number: player?.jersey_number != null ? String(player.jersey_number) : '',
     },
   })
+
+  const jersey = watch('jersey_number')
 
   const onSubmit = handleSubmit(async (values) => {
     setFormError(null)
@@ -72,6 +76,12 @@ export function PlayerForm({
     <Modal title={isEdit ? 'Editar jugador' : 'Nuevo jugador'} onClose={onClose}>
       <form onSubmit={onSubmit} noValidate>
         {formError && <div className="login-card__error">{formError}</div>}
+
+        <div className="join2__jersey" style={{ justifyContent: 'center', marginBottom: 16 }}>
+          <div className="join2__jersey-box">
+            <JerseyPreview number={jersey} error={Boolean(errors.jersey_number)} size={96} />
+          </div>
+        </div>
 
         <FormField
           label="Nombre del jugador"
