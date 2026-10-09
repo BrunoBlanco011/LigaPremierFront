@@ -63,6 +63,8 @@ export interface Player {
   club_id: UUID
   full_name: string
   jersey_number: number | null
+  /** YYYY-MM-DD. Solo llega al admin y al coach del club; al público, null. */
+  birth_date: string | null
   is_active: boolean
 }
 
