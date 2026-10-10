@@ -35,6 +35,7 @@ export function useGenerateSchedule(tournamentId: string) {
       qc.invalidateQueries({ queryKey: ['tournaments', tournamentId, 'rounds'] })
       qc.invalidateQueries({ queryKey: ['tournaments', tournamentId, 'matches'] })
     },
+    meta: { successMessage: 'Rol de juegos generado' },
   })
 }
 
@@ -53,6 +54,7 @@ export function useCreateRound(tournamentId: string) {
       api.post<Round>(`/tournaments/${tournamentId}/rounds`, input),
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ['tournaments', tournamentId, 'rounds'] }),
+    meta: { successMessage: 'Jornada creada' },
   })
 }
 
@@ -62,5 +64,6 @@ export function useDeleteRound(tournamentId: string) {
     mutationFn: (roundId: string) => api.del<void>(`/rounds/${roundId}`),
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ['tournaments', tournamentId, 'rounds'] }),
+    meta: { successMessage: 'Jornada eliminada' },
   })
 }

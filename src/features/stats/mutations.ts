@@ -11,5 +11,6 @@ export function usePutMatchStats(matchId: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['matches', matchId, 'stats'] })
     },
+    meta: { successMessage: 'Estadísticas guardadas' },
   })
 }

@@ -105,7 +105,7 @@ export function ResultForm({
           </div>
           <div className="modal__foot">
             <Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>
-            <Button variant="flag" onClick={submitScore} disabled={save.isPending}>
+            <Button variant="primary" onClick={submitScore} disabled={save.isPending}>
               {save.isPending ? 'Guardando…' : 'Guardar resultado'}
             </Button>
           </div>

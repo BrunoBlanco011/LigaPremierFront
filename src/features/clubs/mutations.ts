@@ -14,6 +14,7 @@ export function useCreateClub() {
   return useMutation({
     mutationFn: (input: ClubInput) => api.post<Club>('/clubs', input),
     onSuccess: () => qc.invalidateQueries({ queryKey: clubKeys.all }),
+    meta: { successMessage: 'Club creado' },
   })
 }
 
@@ -23,6 +24,7 @@ export function useUpdateClub(id: string) {
     mutationFn: (input: Partial<ClubInput>) =>
       api.patch<Club>(`/clubs/${id}`, input),
     onSuccess: () => qc.invalidateQueries({ queryKey: clubKeys.all }),
+    meta: { successMessage: 'Club actualizado' },
   })
 }
 
@@ -31,6 +33,7 @@ export function useDeleteClub() {
   return useMutation({
     mutationFn: (id: string) => api.del<void>(`/clubs/${id}`),
     onSuccess: () => qc.invalidateQueries({ queryKey: clubKeys.all }),
+    meta: { successMessage: 'Club eliminado' },
   })
 }
 
@@ -47,6 +50,7 @@ export function useUploadClubLogo(id: string) {
       qc.invalidateQueries({ queryKey: clubKeys.all })
       qc.invalidateQueries({ queryKey: clubKeys.detail(id) })
     },
+    meta: { successMessage: 'Logo actualizado' },
   })
 }
 
@@ -62,6 +66,7 @@ export function useEnrollClubs(tournamentId: string) {
       qc.invalidateQueries({
         queryKey: ['tournaments', tournamentId, 'teams'],
       }),
+    meta: { successMessage: 'Equipos inscritos' },
   })
 }
 
@@ -74,5 +79,6 @@ export function useRemoveEnrollment(tournamentId: string) {
       qc.invalidateQueries({
         queryKey: ['tournaments', tournamentId, 'teams'],
       }),
+    meta: { successMessage: 'Inscripción cancelada' },
   })
 }

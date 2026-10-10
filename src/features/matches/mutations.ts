@@ -23,6 +23,7 @@ export function useCreateMatch(tournamentId: string) {
     mutationFn: (input: MatchInput) =>
       api.post<Match>(`/tournaments/${tournamentId}/matches`, input),
     onSuccess: () => invalidate(qc, tournamentId),
+    meta: { successMessage: 'Partido creado' },
   })
 }
 
@@ -32,6 +33,7 @@ export function useUpdateMatch(tournamentId: string) {
     mutationFn: ({ id, input }: { id: string; input: Partial<MatchInput> }) =>
       api.patch<Match>(`/matches/${id}`, input),
     onSuccess: () => invalidate(qc, tournamentId),
+    meta: { successMessage: 'Partido actualizado' },
   })
 }
 
@@ -40,6 +42,7 @@ export function useDeleteMatch(tournamentId: string) {
   return useMutation({
     mutationFn: (id: string) => api.del<void>(`/matches/${id}`),
     onSuccess: () => invalidate(qc, tournamentId),
+    meta: { successMessage: 'Partido eliminado' },
   })
 }
 
@@ -57,6 +60,7 @@ export function useSaveResult(tournamentId: string) {
       away_score: number
     }) => api.put<Match>(`/matches/${id}/result`, { home_score, away_score }),
     onSuccess: () => invalidate(qc, tournamentId),
+    meta: { successMessage: 'Resultado guardado' },
   })
 }
 
@@ -70,5 +74,6 @@ export function useForfeit(tournamentId: string) {
         forfeit_loser_team_id: loserTeamId,
       }),
     onSuccess: () => invalidate(qc, tournamentId),
+    meta: { successMessage: 'Forfeit registrado' },
   })
 }

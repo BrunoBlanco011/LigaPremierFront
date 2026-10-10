@@ -42,7 +42,7 @@ export function InviteButton({ clubId }: { clubId: string }) {
           </p>
           <div style={{ display: 'flex', gap: 8 }}>
             <input className="input" readOnly value={url} onFocus={(e) => e.target.select()} />
-            <Button variant="flag" onClick={copy}>
+            <Button variant="primary" onClick={copy}>
               {copied ? <Check size={16} /> : <Copy size={16} />} {copied ? 'Copiado' : 'Copiar'}
             </Button>
           </div>

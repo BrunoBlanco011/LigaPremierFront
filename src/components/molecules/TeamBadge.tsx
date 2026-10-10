@@ -14,6 +14,8 @@ export function TeamBadge({
   showName = true,
   size = 34,
 }: TeamBadgeProps) {
+  // Debajo de 28 px solo cabe una inicial legible (RF-UX 27).
+  const label = size < 28 ? initials(name).slice(0, 1) : initials(name)
   return (
     <span className="team-badge">
       {logoUrl ? (
@@ -29,7 +31,7 @@ export function TeamBadge({
           style={{ width: size, height: size }}
           aria-hidden="true"
         >
-          {initials(name)}
+          {label}
         </span>
       )}
       {showName && <span className="team-badge__name">{name}</span>}

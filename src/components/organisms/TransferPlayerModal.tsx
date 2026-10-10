@@ -63,7 +63,7 @@ export function TransferPlayerModal({
           Cancelar
         </Button>
         <Button
-          variant="flag"
+          variant="primary"
           onClick={submit}
           disabled={!target || transfer.isPending}
         >

@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { ChevronLeft, Save } from 'lucide-react'
 import type { Player, PlayerStat } from '@/types/api'
 import { useMatch, useMatchStats } from '@/features/matches/queries'
@@ -8,7 +8,8 @@ import { usePutMatchStats } from '@/features/stats/mutations'
 import { Button } from '@/components/atoms/Button'
 import { ErrorState, LoadingState } from '@/components/molecules/StateView'
 import { StatTablesLayout } from '@/components/molecules/StatTablesLayout'
-import { friendlyMessage } from '@/lib/errors'
+import { useConfirm } from '@/components/molecules/ConfirmDialog'
+import { alertOnError } from '@/lib/mutationHelpers'
 import { usePageTitle } from '@/lib/usePageTitle'
 
 type StatKey = keyof Omit<PlayerStat, 'player_id' | 'attended'>
@@ -40,10 +41,46 @@ export function StatSheetPage() {
   const homePlayers = useTeamPlayers(match.data?.home_team_id ?? '')
   const awayPlayers = useTeamPlayers(match.data?.away_team_id ?? '')
   const save = usePutMatchStats(mid)
+  const navigate = useNavigate()
+  const confirm = useConfirm()
 
   // Solo guardamos las ediciones del usuario; la base se deriva de los datos.
   const [edits, setEdits] = useState<Map<string, PlayerStat>>(new Map())
   const [saved, setSaved] = useState(false)
+
+  const dirty = edits.size > 0 && !saved
+
+  // Avisa si se recarga o cierra la pestaña con cambios sin guardar.
+  useEffect(() => {
+    if (!dirty) return
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  }, [dirty])
+
+  const backToMatches = () => navigate(`/admin/torneos/${id}/partidos`)
+
+  // Salir con cambios sin guardar pide confirmación (RF-UX 26).
+  const leave = () => {
+    if (!dirty) return backToMatches()
+    void confirm({
+      title: '¿Salir sin guardar?',
+      body: 'Hay estadísticas capturadas que aún no se guardan. Se perderán si sales.',
+      confirmLabel: 'Salir sin guardar',
+      cancelLabel: 'Seguir capturando',
+      danger: true,
+    }).then((ok) => {
+      if (ok) backToMatches()
+    })
+  }
+
+  const discard = () => {
+    setEdits(new Map())
+    setSaved(false)
+  }
 
   usePageTitle(
     home.data && away.data ? `Captura · ${home.data.name} vs ${away.data.name}` : 'Captura',
@@ -82,7 +119,7 @@ export function StatSheetPage() {
     })
     save.mutate(rows, {
       onSuccess: () => setSaved(true),
-      onError: (e) => window.alert(friendlyMessage(e)),
+      onError: alertOnError,
     })
   }
 
@@ -153,9 +190,9 @@ export function StatSheetPage() {
 
   return (
     <>
-      <Link to={`/admin/torneos/${id}/partidos`} className="link-more" style={{ marginBottom: 12 }}>
+      <button type="button" onClick={leave} className="link-more" style={{ marginBottom: 12 }}>
         <ChevronLeft size={16} /> Partidos
-      </Link>
+      </button>
       <div className="dash__topbar">
         <div>
           <p className="eyebrow">Captura de estadísticas</p>
@@ -163,15 +200,12 @@ export function StatSheetPage() {
             {home.data?.name ?? 'Local'} vs {away.data?.name ?? 'Visitante'}
           </h1>
         </div>
-        <Button variant="flag" onClick={onSave} disabled={save.isPending}>
-          <Save size={16} /> {save.isPending ? 'Guardando…' : saved ? 'Guardado ✓' : 'Guardar todo'}
-        </Button>
       </div>
 
       {existing.isLoading || homePlayers.isLoading || awayPlayers.isLoading ? (
         <LoadingState />
       ) : (
-        <div style={{ marginTop: 16 }}>
+        <div style={{ marginTop: 16, paddingBottom: 76 }}>
           <StatTablesLayout
             homeLabel={home.data?.name ?? 'Local'}
             awayLabel={away.data?.name ?? 'Visitante'}
@@ -180,6 +214,21 @@ export function StatSheetPage() {
           />
         </div>
       )}
+
+      {/* Barra inferior sticky: la captura termina aquí (RF-UX 26). */}
+      <div className="savebar" role="region" aria-label="Guardar estadísticas">
+        <span className={`savebar__status${dirty ? ' is-dirty' : ''}`}>
+          {dirty ? 'Cambios sin guardar' : saved ? 'Estadísticas guardadas' : 'Sin cambios'}
+        </span>
+        <div className="savebar__actions">
+          <Button variant="secondary" onClick={discard} disabled={!dirty || save.isPending}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={onSave} loading={save.isPending} disabled={!dirty}>
+            <Save size={16} /> {save.isPending ? 'Guardando…' : 'Guardar estadísticas'}
+          </Button>
+        </div>
+      </div>
     </>
   )
 }

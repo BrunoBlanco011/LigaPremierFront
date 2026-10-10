@@ -73,7 +73,7 @@ export function StandingsAdminPanel({ tournamentId }: { tournamentId: string }) 
 
       <div className="dash__topbar" style={{ margin: '32px 0 12px' }}>
         <h2 style={{ fontSize: 20 }}>Ajustes manuales</h2>
-        <Button variant="flag" size="sm" onClick={() => setOpen(true)}>
+        <Button variant="primary" size="sm" onClick={() => setOpen(true)}>
           <Plus size={14} /> Nuevo ajuste
         </Button>
       </div>
@@ -148,7 +148,7 @@ export function StandingsAdminPanel({ tournamentId }: { tournamentId: string }) 
           />
           <div className="modal__foot">
             <Button variant="ghost" onClick={() => setOpen(false)}>Cancelar</Button>
-            <Button variant="flag" onClick={submit} disabled={create.isPending}>
+            <Button variant="primary" onClick={submit} disabled={create.isPending}>
               {create.isPending ? 'Guardando…' : 'Agregar ajuste'}
             </Button>
           </div>

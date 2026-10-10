@@ -35,6 +35,7 @@ export function useCreateAdjustment(tournamentId: string) {
         input,
       ),
     onSuccess: () => invalidate(qc, tournamentId),
+    meta: { successMessage: 'Ajuste aplicado' },
   })
 }
 
@@ -43,5 +44,6 @@ export function useDeleteAdjustment(tournamentId: string) {
   return useMutation({
     mutationFn: (id: string) => api.del<void>(`/standing-adjustments/${id}`),
     onSuccess: () => invalidate(qc, tournamentId),
+    meta: { successMessage: 'Ajuste eliminado' },
   })
 }

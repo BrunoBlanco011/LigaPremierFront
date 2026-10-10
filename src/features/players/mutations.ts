@@ -15,6 +15,7 @@ export function useCreatePlayer(clubId: string) {
     mutationFn: (input: PlayerInput) =>
       api.post<Player>(`/clubs/${clubId}/players`, input),
     onSuccess: () => qc.invalidateQueries({ queryKey: clubKeys.players(clubId) }),
+    meta: { successMessage: 'Jugador agregado' },
   })
 }
 
@@ -29,6 +30,7 @@ export function useUpdatePlayer(clubId: string) {
       input: Partial<PlayerInput & { is_active: boolean }>
     }) => api.patch<Player>(`/players/${id}`, input),
     onSuccess: () => qc.invalidateQueries({ queryKey: clubKeys.players(clubId) }),
+    meta: { successMessage: 'Jugador actualizado' },
   })
 }
 
@@ -37,6 +39,7 @@ export function useDeletePlayer(clubId: string) {
   return useMutation({
     mutationFn: (id: string) => api.del<void>(`/players/${id}`),
     onSuccess: () => qc.invalidateQueries({ queryKey: clubKeys.players(clubId) }),
+    meta: { successMessage: 'Jugador eliminado' },
   })
 }
 
@@ -50,5 +53,6 @@ export function useTransferPlayer(fromClubId: string) {
       qc.invalidateQueries({ queryKey: clubKeys.players(fromClubId) })
       qc.invalidateQueries({ queryKey: clubKeys.players(clubId) })
     },
+    meta: { successMessage: 'Jugador transferido' },
   })
 }

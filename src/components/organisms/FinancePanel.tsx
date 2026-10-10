@@ -78,7 +78,7 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
           <Button variant="outline" onClick={() => setRegOpen(true)}>
             <CircleDollarSign size={16} /> Cargar inscripción
           </Button>
-          <Button variant="flag" onClick={() => setMovOpen(true)}>
+          <Button variant="primary" onClick={() => setMovOpen(true)}>
             <Plus size={16} /> Movimiento
           </Button>
         </div>
@@ -167,7 +167,7 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
           />
           <div className="modal__foot">
             <Button variant="ghost" onClick={() => setRegOpen(false)}>Cancelar</Button>
-            <Button variant="flag" onClick={submitRegistration} disabled={charge.isPending}>
+            <Button variant="primary" onClick={submitRegistration} disabled={charge.isPending}>
               {charge.isPending ? 'Cargando…' : 'Cargar'}
             </Button>
           </div>
@@ -215,7 +215,7 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
           />
           <div className="modal__foot">
             <Button variant="ghost" onClick={() => setMovOpen(false)}>Cancelar</Button>
-            <Button variant="flag" onClick={submitMovement} disabled={create.isPending}>
+            <Button variant="primary" onClick={submitMovement} disabled={create.isPending}>
               {create.isPending ? 'Guardando…' : 'Registrar'}
             </Button>
           </div>

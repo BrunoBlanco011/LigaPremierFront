@@ -46,7 +46,7 @@ export function SchedulePanel({ tournamentId }: { tournamentId: string }) {
         <p style={{ color: 'var(--ink-soft)', fontSize: 14 }}>
           Genera el rol todos-contra-todos o administra las jornadas manualmente.
         </p>
-        <Button variant="flag" onClick={() => setGenOpen(true)}>
+        <Button variant="primary" onClick={() => setGenOpen(true)}>
           <CalendarPlus size={16} /> Generar rol
         </Button>
       </div>

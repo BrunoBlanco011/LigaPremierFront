@@ -40,7 +40,7 @@ export function AdminClubsPage() {
           <h1 className="page__title" style={{ fontSize: 30 }}>Clubes</h1>
         </div>
         <Button
-          variant="flag"
+          variant="primary"
           onClick={() => {
             setEditing(undefined)
             setFormOpen(true)

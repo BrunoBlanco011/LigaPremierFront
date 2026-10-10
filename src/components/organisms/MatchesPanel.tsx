@@ -85,7 +85,7 @@ export function MatchesPanel({ tournamentId }: { tournamentId: string }) {
           Ajusta fecha, sede y estado; captura o corrige el resultado.
         </p>
         <Button
-          variant="flag"
+          variant="primary"
           onClick={() => {
             setEditing(undefined)
             setFormOpen(true)

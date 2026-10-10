@@ -42,7 +42,7 @@ export function AdminUsersPage() {
           <p className="eyebrow">Administración</p>
           <h1 className="page__title" style={{ fontSize: 30 }}>Usuarios</h1>
         </div>
-        <Button variant="flag" onClick={() => setOpen(true)}>
+        <Button variant="primary" onClick={() => setOpen(true)}>
           <Plus size={16} /> Nuevo usuario
         </Button>
       </div>

@@ -64,7 +64,7 @@ export function RosterManager({
           Mostrar dados de baja
         </label>
         <Button
-          variant="flag"
+          variant="primary"
           onClick={() => {
             setEditing(undefined)
             setFormOpen(true)

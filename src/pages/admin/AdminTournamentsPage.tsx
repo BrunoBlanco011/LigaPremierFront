@@ -50,7 +50,7 @@ export function AdminTournamentsPage() {
           <p className="eyebrow">Administración</p>
           <h1 className="page__title" style={{ fontSize: 30 }}>Torneos</h1>
         </div>
-        <Button variant="flag" onClick={openCreate}>
+        <Button variant="primary" onClick={openCreate}>
           <Plus size={16} /> Nuevo torneo
         </Button>
       </div>
@@ -64,7 +64,7 @@ export function AdminTournamentsPage() {
           title="Sin torneos"
           message="Crea el primer torneo para empezar."
           action={
-            <Button variant="flag" onClick={openCreate}>
+            <Button variant="primary" onClick={openCreate}>
               <Plus size={16} /> Nuevo torneo
             </Button>
           }

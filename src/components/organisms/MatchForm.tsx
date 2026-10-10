@@ -144,7 +144,7 @@ export function MatchForm({
 
         <div className="modal__foot">
           <Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>
-          <Button type="submit" variant="flag" disabled={isSubmitting}>
+          <Button type="submit" variant="primary" disabled={isSubmitting}>
             {isSubmitting ? 'Guardando…' : isEdit ? 'Guardar' : 'Crear partido'}
           </Button>
         </div>

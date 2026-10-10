@@ -19,6 +19,7 @@ export function useChargeRegistration(tournamentId: string) {
     mutationFn: (input: RegistrationFeeInput) =>
       api.post(`/tournaments/${tournamentId}/finance/registration-fees`, input),
     onSuccess: () => invalidate(qc, tournamentId),
+    meta: { successMessage: 'Inscripción cargada' },
   })
 }
 
@@ -41,6 +42,7 @@ export function useCreateMovement(tournamentId: string) {
         input,
       ),
     onSuccess: () => invalidate(qc, tournamentId),
+    meta: { successMessage: 'Movimiento registrado' },
   })
 }
 
@@ -49,5 +51,6 @@ export function useDeleteMovement(tournamentId: string) {
   return useMutation({
     mutationFn: (id: string) => api.del<void>(`/finance/movements/${id}`),
     onSuccess: () => invalidate(qc, tournamentId),
+    meta: { successMessage: 'Movimiento eliminado' },
   })
 }

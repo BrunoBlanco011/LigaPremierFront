@@ -156,7 +156,7 @@ export function GenerateScheduleForm({
               {generate.isPending ? 'Reemplazando…' : 'Reemplazar rol existente'}
             </Button>
           ) : (
-            <Button type="submit" variant="flag" disabled={generate.isPending}>
+            <Button type="submit" variant="primary" disabled={generate.isPending}>
               {generate.isPending ? 'Generando…' : 'Generar'}
             </Button>
           )}

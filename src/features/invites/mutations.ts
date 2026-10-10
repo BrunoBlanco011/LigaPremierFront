@@ -6,6 +6,7 @@ import type { ClubInvite, Player } from '@/types/api'
 export function useCreateInvite(clubId: string) {
   return useMutation({
     mutationFn: () => api.post<ClubInvite>(`/clubs/${clubId}/invites`),
+    meta: { successMessage: 'Invitación generada' },
   })
 }
 
@@ -19,5 +20,6 @@ export function useRedeemInvite(token: string) {
   return useMutation({
     mutationFn: (input: SelfRegisterInput) =>
       api.post<Player>(`/invites/${token}/players`, input, { auth: false }),
+    meta: { successMessage: 'Registro completado' },
   })
 }

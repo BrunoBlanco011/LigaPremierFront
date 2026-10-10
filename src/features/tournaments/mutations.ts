@@ -17,6 +17,7 @@ export function useCreateTournament() {
     mutationFn: (input: TournamentInput) =>
       api.post<Tournament>('/tournaments', input),
     onSuccess: () => qc.invalidateQueries({ queryKey: tournamentKeys.lists }),
+    meta: { successMessage: 'Torneo creado' },
   })
 }
 
@@ -29,6 +30,7 @@ export function useUpdateTournament(id: string) {
       qc.invalidateQueries({ queryKey: tournamentKeys.lists })
       qc.invalidateQueries({ queryKey: tournamentKeys.detail(id) })
     },
+    meta: { successMessage: 'Torneo actualizado' },
   })
 }
 
@@ -37,5 +39,6 @@ export function useDeleteTournament() {
   return useMutation({
     mutationFn: (id: string) => api.del<void>(`/tournaments/${id}`),
     onSuccess: () => qc.invalidateQueries({ queryKey: tournamentKeys.lists }),
+    meta: { successMessage: 'Torneo eliminado' },
   })
 }

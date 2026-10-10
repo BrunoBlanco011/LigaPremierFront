@@ -96,7 +96,7 @@ export function PlayerForm({
           <Button type="button" variant="ghost" onClick={onClose}>
             Cancelar
           </Button>
-          <Button type="submit" variant="flag" disabled={isSubmitting}>
+          <Button type="submit" variant="primary" disabled={isSubmitting}>
             {isSubmitting ? 'Guardando…' : isEdit ? 'Guardar' : 'Agregar'}
           </Button>
         </div>

@@ -4,11 +4,9 @@ import { FootballSpinner } from './FootballSpinner'
 type Variant =
   | 'primary'
   | 'secondary'
-  | 'star'
   | 'ghost'
   | 'danger'
-  /** alias heredados: flag → star, outline → secondary */
-  | 'flag'
+  /** alias heredado: outline → secondary */
   | 'outline'
 type Size = 'sm' | 'md' | 'lg'
 
@@ -21,12 +19,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode
 }
 
-// Sobre fondos sólidos (primario/peligro/dorado) el balón va blanco.
+// Sobre fondos sólidos (primario/peligro) el balón va blanco.
 const INVERSE: Partial<Record<Variant, boolean>> = {
   primary: true,
   danger: true,
-  star: true,
-  flag: true,
 }
 
 export function Button({

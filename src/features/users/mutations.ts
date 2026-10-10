@@ -14,6 +14,7 @@ export function useCreateUser() {
   return useMutation({
     mutationFn: (input: UserInput) => api.post<User>('/users', input),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['users'] }),
+    meta: { successMessage: 'Usuario creado' },
   })
 }
 
@@ -22,5 +23,6 @@ export function useDeleteUser() {
   return useMutation({
     mutationFn: (id: string) => api.del<void>(`/users/${id}`),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['users'] }),
+    meta: { successMessage: 'Usuario eliminado' },
   })
 }

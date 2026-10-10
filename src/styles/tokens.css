@@ -164,13 +164,13 @@
   position: absolute; left: 0; right: 0; bottom: 34px;
   display: flex; justify-content: space-around;
   font-family: var(--font-display); font-style: italic; font-weight: 800;
-  font-size: 56px; line-height: 1; color: rgb(255 255 255 / 0.09);
+  font-size: 56px; line-height: 1; color: rgb(255 255 255 / 0.05);
   pointer-events: none; user-select: none;
 }
 
 /* Etiqueta inclinada (mismo ángulo que el swoosh del logo). El texto va en un <span> hijo */
 @utility tag {
-  display: inline-flex; align-items: center; transform: skewX(-12deg);
+  display: inline-flex; align-items: center; align-self: flex-start; width: fit-content; transform: skewX(-12deg);
   background: var(--color-dorado); color: var(--color-noche);
   padding: 4px 12px; font-size: 12px; line-height: 16px; font-weight: 700; letter-spacing: 0.08em;
   & > span { transform: skewX(12deg); }

@@ -98,7 +98,7 @@ export function InscriptionPanel({ tournamentId }: { tournamentId: string }) {
         <div className="dash__topbar" style={{ marginBottom: 12 }}>
           <h3 style={{ fontSize: 18 }}>Clubes disponibles</h3>
           <Button
-            variant="flag"
+            variant="primary"
             size="sm"
             onClick={submit}
             disabled={checked.size === 0 || enroll.isPending}
