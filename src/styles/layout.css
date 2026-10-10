@@ -868,12 +868,26 @@
 @media (max-width: 560px) { .clubs-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
 /* ── Rol de juegos ──────────────────────────────────────────────── */
-.round-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+/* Envoltura con degradado a la derecha (indica que hay más jornadas). */
+.round-nav-wrap { position: relative; }
+.round-nav-wrap::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 4px;
+  width: 32px;
+  background: linear-gradient(90deg, transparent, var(--color-fondo));
+  pointer-events: none;
+}
+.round-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.round-nav::-webkit-scrollbar { display: none; }
 .round-pill {
   flex: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 4px;
   min-width: 48px;
   height: 44px;
   padding: 0 12px;
@@ -888,7 +902,11 @@
   transition: background var(--dur-rapida), border-color var(--dur-rapida);
 }
 .round-pill:hover { border-color: var(--color-campo); }
+/* Jornada completa: atenuada con check verde */
+.round-pill.is-done { color: var(--color-texto-2); border-color: var(--color-borde); }
+.round-pill.is-done > svg { color: var(--color-exito); }
 .round-pill.is-active { background: var(--color-premier); color: #fff; border-color: var(--color-premier); }
+.round-pill.is-active.is-done > svg { color: #fff; }
 .day-head {
   font-size: 18px;
   line-height: 24px;
@@ -1024,6 +1042,144 @@ a.mcard:active { transform: translateY(0) scale(0.99); }
   pointer-events: none;
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
 }
+
+/* ── Resultados agrupados por jornada (details/summary) ─────────── */
+.results-group { border-top: 1px solid var(--color-borde); padding-top: 14px; }
+.results-group__title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+summary.results-group__title { cursor: pointer; list-style: none; }
+summary.results-group__title::-webkit-details-marker { display: none; }
+summary.results-group__title::before {
+  content: '▸';
+  align-self: center;
+  font-size: 13px;
+  color: var(--color-texto-2);
+  transition: transform var(--dur-rapida) var(--ease-salida);
+}
+.results-group[open] > summary.results-group__title::before { transform: rotate(90deg); }
+.results-group__dates { font-family: var(--font-sans); font-size: 14px; font-weight: 400; color: var(--color-texto-2); }
+.results-group__count { margin-left: auto; align-self: center; font-family: var(--font-sans); font-size: 13px; font-weight: 500; color: var(--color-texto-2); }
+
+/* ── Control segmentado (categorías de líderes) ─────────────────── */
+.seg {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: var(--color-superficie-2);
+  padding: 4px;
+  border-radius: var(--radius-md);
+}
+.seg__btn {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--color-texto-2);
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--dur-rapida), color var(--dur-rapida);
+}
+.seg__btn:hover { color: var(--color-texto); }
+.seg__btn.is-active { background: var(--color-superficie); color: var(--color-premier); box-shadow: var(--shadow-sm); }
+
+/* ── Lista de líderes ───────────────────────────────────────────── */
+.leaders {
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.leader-row {
+  display: grid;
+  grid-template-columns: 36px 32px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--color-borde);
+}
+.leader-row:first-child { border-top: 0; background: var(--color-dorado-claro); }
+.leader-row__pos {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--color-texto-2);
+  text-align: center;
+}
+.leader-row:first-child .leader-row__pos { color: var(--color-dorado-texto); }
+.leader-row__who { display: flex; flex-direction: column; min-width: 0; }
+.leader-row__name { font-weight: 600; color: var(--color-texto); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.leader-row__name:hover { color: var(--color-premier); }
+.leader-row__num { color: var(--color-texto-2); margin-right: 6px; }
+.leader-row__team { font-size: 13px; color: var(--color-texto-2); }
+.leader-row__val { font-size: 26px; color: var(--color-texto); }
+.leader-row:first-child .leader-row__val { color: var(--color-dorado-texto); }
+
+/* Resumen del equipo en el torneo (posición, récord, puntos, racha) */
+.team-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 20px;
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radius-lg);
+  margin-bottom: 8px;
+}
+.team-summary__stat { display: flex; flex-direction: column; }
+.team-summary__num { font-size: 28px; color: var(--color-texto); }
+.team-summary__label { font-size: 12px; color: var(--color-texto-2); text-transform: uppercase; letter-spacing: 0.04em; }
+.streak { display: flex; gap: 4px; margin-left: auto; }
+.streak__dot {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  display: inline-grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+.streak__dot--g { background: var(--color-exito-claro); color: var(--color-exito); }
+.streak__dot--p { background: var(--color-error-claro); color: var(--color-error); }
+/* Marca G/P en la esquina de una tarjeta de resultado */
+.gp {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  display: inline-grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+.gp--g { background: var(--color-exito-claro); color: var(--color-exito); }
+.gp--p { background: var(--color-error-claro); color: var(--color-error); }
+
+/* Barra de filtros (partidos admin) */
+.filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+.filters > * { min-width: 160px; flex: 0 1 220px; }
+
+/* Tarjetas de totales de finanzas */
+.fin-totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+@media (max-width: 640px) { .fin-totals { grid-template-columns: 1fr; } }
+
+/* Tarjetas de totales del perfil de jugador: 3×2 escritorio, 2×3 móvil */
+.player-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+@media (max-width: 640px) { .player-stats { grid-template-columns: repeat(2, 1fr); } }
 
 /* Sección con título itálico */
 .ital-h2 { margin: 0; font-size: clamp(28px, 5vw, 40px); line-height: 1; }

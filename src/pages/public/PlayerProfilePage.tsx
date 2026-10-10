@@ -1,5 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
+import { ChevronLeft } from 'lucide-react'
 import { usePlayer, usePlayerStats } from '@/features/players/queries'
+import { useClub } from '@/features/clubs/queries'
 import { StatCard } from '@/components/molecules/StatCard'
 import { ErrorState, LoadingState } from '@/components/molecules/StateView'
 import { usePageTitle } from '@/lib/usePageTitle'
@@ -9,6 +11,7 @@ export function PlayerProfilePage() {
   const player = usePlayer(id)
   usePageTitle(player.data?.full_name ?? null)
   const stats = usePlayerStats(id)
+  const club = useClub(player.data?.club_id ?? '')
 
   if (player.isLoading) return <div className="container page"><LoadingState /></div>
   if (player.isError || !player.data)
@@ -19,16 +22,32 @@ export function PlayerProfilePage() {
     )
 
   const t = stats.data?.totals
+  const clubHref = `/clubes/${player.data.club_id}`
 
   return (
     <div className="container page">
-      <p className="eyebrow">Jugador</p>
-      <h1 className="page__title" style={{ fontSize: 32 }}>
+      <Link
+        to={clubHref}
+        className="link-more"
+        style={{ display: 'flex', width: 'fit-content', marginBottom: 12 }}
+      >
+        <ChevronLeft size={16} /> {club.data?.name ?? 'Club'}
+      </Link>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
         {player.data.jersey_number != null && (
-          <span style={{ color: 'var(--ink-faint)' }}>#{player.data.jersey_number} </span>
+          <span className="ital" style={{ fontSize: 56, lineHeight: 1, color: 'var(--color-premier)' }}>
+            {player.data.jersey_number}
+          </span>
         )}
-        {player.data.full_name}
-      </h1>
+        <div>
+          <h1 className="page__title" style={{ fontSize: 32 }}>{player.data.full_name}</h1>
+          {club.data && (
+            <Link to={clubHref} className="page__sub" style={{ marginTop: 4, display: 'inline-block' }}>
+              {club.data.name}
+            </Link>
+          )}
+        </div>
+      </div>
 
       <div className="section-head">
         <h2>Totales</h2>
@@ -36,10 +55,10 @@ export function PlayerProfilePage() {
       {stats.isLoading ? (
         <LoadingState />
       ) : t ? (
-        <div className="grid grid--4">
+        <div className="player-stats">
           <StatCard num={t.games_attended} label="Asistencia" />
           <StatCard num={t.touchdowns} label="Anotaciones" />
-          <StatCard num={t.td_passes} label="Pases TD" />
+          <StatCard num={t.td_passes} label="Pases de anotación" />
           <StatCard num={t.interceptions} label="Intercepciones" />
           <StatCard num={t.sacks} label="Capturas" />
           <StatCard num={t.tackles} label="Tackles" />

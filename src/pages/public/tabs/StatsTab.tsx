@@ -34,11 +34,14 @@ export function StatsTab() {
 
   return (
     <>
-      <div className="tabs" style={{ marginBottom: 20 }}>
+      <div className="seg" role="tablist" aria-label="Categoría de líderes">
         {CATEGORIES.map((c) => (
           <button
             key={c}
-            className={`tab${sort === c ? ' is-active' : ''}`}
+            type="button"
+            role="tab"
+            aria-selected={sort === c}
+            className={`seg__btn${sort === c ? ' is-active' : ''}`}
             onClick={() => setSort(c)}
           >
             {LEADER_LABELS[c]}
@@ -53,40 +56,21 @@ export function StatsTab() {
       ) : !leaders.data || leaders.data.length === 0 ? (
         <EmptyState title="Sin estadísticas" message="Aún no hay datos para esta categoría." />
       ) : (
-        <div className="table-wrap">
-          <table className="table tnum">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Jugador</th>
-                <th>Equipo</th>
-                <th className="num">{LEADER_LABELS[sort]}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {leaders.data.map((row, i) => (
-                <tr key={row.player_id}>
-                  <td>
-                    <span className="pos">{i + 1}</span>
-                  </td>
-                  <td>
-                    <Link to={`/jugadores/${row.player_id}`}>
-                      {row.jersey_number != null && (
-                        <b style={{ color: 'var(--ink-faint)', marginRight: 8 }}>
-                          #{row.jersey_number}
-                        </b>
-                      )}
-                      {row.full_name}
-                    </Link>
-                  </td>
-                  <td>
-                    <TeamBadge name={row.team_name} logoUrl={null} />
-                  </td>
-                  <td className="num pts">{valueOf(row, sort)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="leaders tnum">
+          {leaders.data.map((row, i) => (
+            <div className="leader-row" key={row.player_id}>
+              <span className="leader-row__pos" aria-hidden="true">{i + 1}</span>
+              <TeamBadge name={row.team_name} logoUrl={null} showName={false} size={32} />
+              <div className="leader-row__who">
+                <Link to={`/jugadores/${row.player_id}`} className="leader-row__name">
+                  {row.jersey_number != null && <span className="leader-row__num">#{row.jersey_number}</span>}
+                  {row.full_name}
+                </Link>
+                <span className="leader-row__team">{row.team_name}</span>
+              </div>
+              <span className="marc leader-row__val">{valueOf(row, sort)}</span>
+            </div>
+          ))}
         </div>
       )}
     </>

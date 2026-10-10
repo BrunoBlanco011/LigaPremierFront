@@ -28,7 +28,9 @@ export function ClubProfilePage() {
       </div>
     )
 
-  const roster = (players.data ?? []).filter((p) => p.is_active)
+  const roster = (players.data ?? [])
+    .filter((p) => p.is_active)
+    .sort((a, b) => (a.jersey_number ?? 1000) - (b.jersey_number ?? 1000))
 
   return (
     <div className="container page">
@@ -70,13 +72,13 @@ export function ClubProfilePage() {
                     <Link to={`/torneos/${h.tournament.id}`} style={{ fontWeight: 600 }}>
                       {h.tournament.name}
                     </Link>
-                    {h.standing && (
-                      <span style={{ color: 'var(--ink-faint)' }}>
-                        {' '}· {h.standing.position}.º de {h.teams_count}
-                      </span>
+                    {h.tournament.season && (
+                      <span style={{ color: 'var(--color-texto-2)' }}> · {h.tournament.season}</span>
                     )}
                   </td>
-                  <td className="num">{h.standing?.position ?? '—'}</td>
+                  <td className="num">
+                    {h.standing ? `${h.standing.position} / ${h.teams_count}` : '—'}
+                  </td>
                   <td className="num">{h.standing?.won ?? '—'}</td>
                   <td className="num">{h.standing?.lost ?? '—'}</td>
                   <td className="num pts">{h.standing?.points ?? '—'}</td>

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import type { Match, Team } from '@/types/api'
 import { TeamBadge } from '@/components/molecules/TeamBadge'
 import { MatchStatusPill } from '@/components/molecules/StatusPill'
-import { formatDateTime, formatTime, formatDate } from '@/lib/format'
+import { formatTime } from '@/lib/format'
 
 type TeamLite = Pick<Team, 'id' | 'name' | 'logo_url'>
 
@@ -36,7 +36,9 @@ function TeamRow({
   )
 }
 
-/** Tarjeta de partido tipo marcador, en dos renglones (RF-13/14). */
+/** Tarjeta de partido tipo marcador, en dos renglones (RF-13/14).
+ *  Una sola línea meta (hora · sede); el día va en el encabezado del grupo.
+ *  Sin badge en `scheduled` ni `finished`; sí en forfeit/pospuesto/cancelado. */
 export function MatchCard({
   match,
   home,
@@ -54,39 +56,30 @@ export function MatchCard({
   const homeTeam = home ?? match.home_team ?? undefined
   const awayTeam = away ?? match.away_team ?? undefined
 
-  const topLeft = match.venue
-    ?? match.round?.name
-    ?? (match.scheduled_at && !played ? formatDate(match.scheduled_at) : 'Sede por definir')
+  const showBadge = match.status !== 'scheduled' && match.status !== 'finished'
 
-  let foot: string
-  if (match.status === 'forfeit') foot = 'Forfeit (21-0)'
-  else if (played) foot = formatDateTime(match.scheduled_at)
-  else if (match.status === 'scheduled')
-    foot = match.scheduled_at ? `${formatDateTime(match.scheduled_at)}` : 'Horario por definir'
-  else foot = formatDate(match.scheduled_at)
+  // Línea meta: hora (si está programado) · sede.
+  const time = !played && match.scheduled_at ? formatTime(match.scheduled_at) : ''
+  const meta = [time || (match.status === 'scheduled' ? 'Horario por definir' : ''), match.venue]
+    .filter(Boolean)
+    .join(' · ')
+
+  const foot =
+    match.status === 'forfeit'
+      ? `Forfeit (21-0)${match.notes ? ` · ${match.notes}` : ''}`
+      : match.notes || ''
 
   const inner = (
     <>
-      <div className="mcard__top">
-        <span>{topLeft}</span>
-        <MatchStatusPill status={match.status} />
-      </div>
+      {(meta || showBadge) && (
+        <div className="mcard__top">
+          <span className="mcard__meta">{meta}</span>
+          {showBadge && <MatchStatusPill status={match.status} />}
+        </div>
+      )}
       <TeamRow team={homeTeam} score={match.home_score} played={played} isWinner={homeWon} />
       <TeamRow team={awayTeam} score={match.away_score} played={played} isWinner={awayWon} />
-      {!played && match.scheduled_at && match.status === 'scheduled' && (
-        <div
-          className="marc"
-          style={{ textAlign: 'center', marginTop: 8, fontSize: 20, color: 'var(--color-texto-2)' }}
-        >
-          {formatTime(match.scheduled_at)}
-        </div>
-      )}
-      {(match.notes || foot) && (
-        <div className="mcard__foot">
-          {foot}
-          {match.notes && ` · ${match.notes}`}
-        </div>
-      )}
+      {foot && <div className="mcard__foot">{foot}</div>}
     </>
   )
 

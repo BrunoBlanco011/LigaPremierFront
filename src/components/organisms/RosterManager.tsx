@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import type { ReactNode } from 'react'
 import { UserPlus, Pencil, UserMinus, UserCheck, Trash2 } from 'lucide-react'
 import type { Player } from '@/types/api'
 import { useClubPlayers } from '@/features/clubs/queries'
@@ -15,17 +14,18 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
+import { ActionMenu, type ActionItem } from '@/components/molecules/ActionMenu'
 import { alertOnError } from '@/lib/mutationHelpers'
 import { useConfirmMutate } from '@/components/molecules/ConfirmDialog'
 
 /** Gestión de plantilla del club (RF-41): alta, edición, baja y eliminación.
- *  `extraActions` permite inyectar acciones adicionales por jugador (ej. transferir, solo admin). */
+ *  `extraMenuItems` inyecta acciones adicionales al menú (ej. transferir, solo admin). */
 export function RosterManager({
   clubId,
-  extraActions,
+  extraMenuItems,
 }: {
   clubId: string
-  extraActions?: (player: Player) => ReactNode
+  extraMenuItems?: (player: Player) => ActionItem[]
 }) {
   const players = useClubPlayers(clubId)
   const update = useUpdatePlayer(clubId)
@@ -104,8 +104,7 @@ export function RosterManager({
                     )}
                   </td>
                   <td>
-                    <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
-                      {extraActions?.(p)}
+                    <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end', alignItems: 'center' }}>
                       <Button
                         size="sm"
                         variant="outline"
@@ -116,27 +115,23 @@ export function RosterManager({
                       >
                         <Pencil size={14} /> Editar
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => deactivate(p)}
-                        disabled={update.isPending}
-                        aria-label={`${p.is_active ? 'Dar de baja a' : 'Reactivar a'} ${p.full_name}`}
-                        data-tooltip={p.is_active ? 'Dar de baja' : 'Reactivar'}
-                      >
-                        {p.is_active ? <UserMinus size={14} /> : <UserCheck size={14} />}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="actions-sep"
-                        onClick={() => remove(p)}
-                        disabled={del.isPending}
-                        aria-label={`Eliminar ${p.full_name}`}
-                        data-tooltip="Eliminar"
-                      >
-                        <Trash2 size={14} color="var(--color-error)" />
-                      </Button>
+                      <ActionMenu
+                        label={`Más acciones de ${p.full_name}`}
+                        items={[
+                          ...(extraMenuItems?.(p) ?? []),
+                          {
+                            label: p.is_active ? 'Dar de baja' : 'Reactivar',
+                            icon: p.is_active ? <UserMinus size={14} /> : <UserCheck size={14} />,
+                            onClick: () => deactivate(p),
+                          },
+                          {
+                            label: 'Eliminar',
+                            danger: true,
+                            icon: <Trash2 size={14} />,
+                            onClick: () => remove(p),
+                          },
+                        ]}
+                      />
                     </div>
                   </td>
                 </tr>

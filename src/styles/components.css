@@ -79,6 +79,42 @@
 /* Separador antes de la acción destructiva en una fila de acciones */
 .actions-sep { margin-left: 8px; padding-left: 8px; border-left: 1px solid var(--color-borde); }
 
+/* Menú "⋯" de acciones */
+.action-menu { position: relative; display: inline-flex; }
+.action-menu__pop {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 20;
+  min-width: 190px;
+  padding: 4px;
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  animation: menu-in 0.15s var(--ease-salida) both;
+}
+.action-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  color: var(--color-texto);
+  text-align: left;
+  cursor: pointer;
+}
+.action-menu__item:hover { background: var(--color-superficie-2); }
+.action-menu__item.is-danger { color: var(--color-error); }
+.action-menu__item.is-danger:hover { background: var(--color-error-claro); }
+
 /* ── Inputs / Select / Textarea ────────────────────────────────── */
 .input {
   font: inherit;

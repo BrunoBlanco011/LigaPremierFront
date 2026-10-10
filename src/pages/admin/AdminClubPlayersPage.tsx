@@ -5,7 +5,6 @@ import type { Player } from '@/types/api'
 import { useClub } from '@/features/clubs/queries'
 import { RosterManager } from '@/components/organisms/RosterManager'
 import { TransferPlayerModal } from '@/components/organisms/TransferPlayerModal'
-import { Button } from '@/components/atoms/Button'
 import { ErrorState, LoadingState } from '@/components/molecules/StateView'
 import { usePageTitle } from '@/lib/usePageTitle'
 
@@ -35,17 +34,13 @@ export function AdminClubPlayersPage() {
 
       <RosterManager
         clubId={id}
-        extraActions={(player) => (
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => setTransferring(player)}
-            aria-label={`Transferir a ${player.full_name} a otro club`}
-            data-tooltip="Transferir"
-          >
-            <ArrowLeftRight size={14} />
-          </Button>
-        )}
+        extraMenuItems={(player) => [
+          {
+            label: 'Transferir a otro club',
+            icon: <ArrowLeftRight size={14} />,
+            onClick: () => setTransferring(player),
+          },
+        ]}
       />
 
       {transferring && (

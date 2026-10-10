@@ -20,6 +20,7 @@ import {
   LoadingState,
 } from '@/components/molecules/StateView'
 import { friendlyMessage } from '@/lib/errors'
+import { formatMoney } from '@/lib/format'
 
 const MOVEMENT_TYPES: { value: FinanceMovementType; label: string }[] = [
   { value: 'payment', label: 'Abono' },
@@ -90,7 +91,24 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
       ) : !summary.data || summary.data.teams.length === 0 ? (
         <EmptyState title="Sin datos financieros" message="Carga la inscripción para empezar." />
       ) : (
-        <div className="table-wrap">
+        <>
+          <div className="fin-totals">
+            <div className="card stat-card">
+              <div className="stat-card__num">{formatMoney(summary.data.total_charges)}</div>
+              <div className="stat-card__label">Total de cargos</div>
+            </div>
+            <div className="card stat-card">
+              <div className="stat-card__num">{formatMoney(summary.data.total_payments)}</div>
+              <div className="stat-card__label">Total de abonos</div>
+            </div>
+            <div className="card stat-card">
+              <div className="stat-card__num">
+                <MoneyText amount={summary.data.total_balance} balance />
+              </div>
+              <div className="stat-card__label">Adeudo total</div>
+            </div>
+          </div>
+          <div className="table-wrap">
           <table className="table tnum">
             <thead>
               <tr>
@@ -98,13 +116,15 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
                 <th className="num">Inscripción</th>
                 <th className="num">Multas</th>
                 <th className="num">Otros</th>
-                <th className="num">Cargos</th>
+                <th className="num">Total de cargos</th>
                 <th className="num">Abonos</th>
                 <th className="num">Adeudo</th>
               </tr>
             </thead>
             <tbody>
-              {summary.data.teams.map((r) => (
+              {[...summary.data.teams]
+                .sort((a, b) => Number(b.balance) - Number(a.balance))
+                .map((r) => (
                 <tr key={r.team.id}>
                   <td><TeamBadge name={r.team.name} logoUrl={r.team.logo_url} /></td>
                   <td className="num"><MoneyText amount={r.registration_fees} /></td>
@@ -126,7 +146,8 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
               </tr>
             </tfoot>
           </table>
-        </div>
+          </div>
+        </>
       )}
 
       {/* Cargar inscripción (RF-30) */}

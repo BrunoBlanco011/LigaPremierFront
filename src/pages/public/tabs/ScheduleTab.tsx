@@ -1,5 +1,6 @@
 import { useOutletContext } from 'react-router-dom'
-import { useMemo, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { Check } from 'lucide-react'
 import type { Match, Round } from '@/types/api'
 import type { TournamentContext } from '../TournamentPage'
 import { useMatches, useRounds } from '@/features/schedule/queries'
@@ -9,12 +10,21 @@ import { MatchesSkeleton } from '@/components/molecules/Skeletons'
 import { usePageTitle } from '@/lib/usePageTitle'
 import { formatDateRange } from '@/lib/format'
 
+const LEAGUE_TZ = 'America/Mexico_City'
 const dayFmt = new Intl.DateTimeFormat('es-MX', {
+  timeZone: LEAGUE_TZ,
   weekday: 'long',
   day: 'numeric',
   month: 'long',
 })
+const dayKeyFmt = new Intl.DateTimeFormat('en-CA', {
+  timeZone: LEAGUE_TZ,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+})
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+const isPlayed = (m: Match) => m.status === 'finished' || m.status === 'forfeit'
 
 export function ScheduleTab() {
   const { tournamentId, tournamentName, teamsById } = useOutletContext<TournamentContext>()
@@ -56,6 +66,23 @@ export function ScheduleTab() {
     return sortedRounds[0].id
   }, [sortedRounds, matches.data])
 
+  // Jornadas completas (todos sus partidos jugados), para marcarlas con un check.
+  const completed = useMemo(() => {
+    const set = new Set<string>()
+    for (const r of sortedRounds) {
+      const ms = byRound.get(r.id) ?? []
+      if (ms.length > 0 && ms.every(isPlayed)) set.add(r.id)
+    }
+    return set
+  }, [sortedRounds, byRound])
+
+  const activeKey = selected ?? defaultRoundId
+  const activeRef = useRef<HTMLButtonElement>(null)
+  // Al montar o cambiar de jornada, centra la jornada activa en el selector.
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({ inline: 'center', block: 'nearest' })
+  }, [activeKey])
+
   if (rounds.isLoading || matches.isLoading) return <MatchesSkeleton count={6} />
   if (rounds.isError)
     return <ErrorState error={rounds.error} onRetry={() => rounds.refetch()} resource="el rol de juegos" />
@@ -69,18 +96,19 @@ export function ScheduleTab() {
       />
     )
 
-  const activeId = selected ?? defaultRoundId
+  const activeId = activeKey
   const round: Round | undefined = sortedRounds.find((r) => r.id === activeId)
   const roundMatches = round ? byRound.get(round.id) ?? [] : []
   const byeTeam = round?.bye_team_id ? teamsById.get(round.bye_team_id) : undefined
 
-  // Partidos de la jornada agrupados por día.
+  // Partidos de la jornada agrupados por día (en hora de la liga).
   const days = new Map<string, { title: string; matches: Match[] }>()
   for (const m of roundMatches) {
-    const key = m.scheduled_at ? m.scheduled_at.slice(0, 10) : 'sin-fecha'
+    const d = m.scheduled_at ? new Date(m.scheduled_at) : null
+    const key = d ? dayKeyFmt.format(d) : 'sin-fecha'
     if (!days.has(key)) {
       days.set(key, {
-        title: m.scheduled_at ? cap(dayFmt.format(new Date(m.scheduled_at))) : 'Fecha por definir',
+        title: d ? cap(dayFmt.format(d)) : 'Fecha por definir',
         matches: [],
       })
     }
@@ -90,19 +118,27 @@ export function ScheduleTab() {
 
   return (
     <>
-      <nav className="round-nav" aria-label="Jornadas">
-        {sortedRounds.map((r) => (
-          <button
-            key={r.id}
-            type="button"
-            className={`round-pill${r.id === activeId ? ' is-active' : ''}`}
-            aria-current={r.id === activeId ? 'true' : undefined}
-            onClick={() => setSelected(r.id)}
-          >
-            J{r.number}
-          </button>
-        ))}
-      </nav>
+      <div className="round-nav-wrap">
+        <nav className="round-nav" aria-label="Jornadas">
+          {sortedRounds.map((r) => {
+            const done = completed.has(r.id)
+            return (
+              <button
+                key={r.id}
+                ref={r.id === activeId ? activeRef : undefined}
+                type="button"
+                className={`round-pill${r.id === activeId ? ' is-active' : ''}${done ? ' is-done' : ''}`}
+                aria-current={r.id === activeId ? 'true' : undefined}
+                aria-label={`Jornada ${r.number}${done ? ' (completa)' : ''}`}
+                onClick={() => setSelected(r.id)}
+              >
+                {done && <Check size={12} aria-hidden="true" />}
+                J{r.number}
+              </button>
+            )
+          })}
+        </nav>
+      </div>
 
       {round && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>

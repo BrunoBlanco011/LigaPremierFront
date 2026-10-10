@@ -80,12 +80,7 @@ export function StandingsTable({
                 <span className="marc st-pts" role="cell">
                   {r.points}
                   {r.adjustment_points !== 0 && (
-                    <sup
-                      title={r.adjustment_reasons.join(', ')}
-                      style={{ color: 'var(--color-advertencia)', fontSize: 12, cursor: 'help' }}
-                    >
-                      *
-                    </sup>
+                    <sup style={{ color: 'var(--color-error)', fontSize: 12 }}>*</sup>
                   )}
                 </span>
               </div>
@@ -95,8 +90,20 @@ export function StandingsTable({
       </div>
       <p className="table__note" style={{ marginTop: 12, fontSize: 14, color: 'var(--color-texto-2)' }}>
         Desempate: puntos, diferencia de puntos, puntos a favor y menos puntos en contra.
-        {rows.some((r) => r.adjustment_points !== 0) && ' * Incluye ajuste manual de puntos.'}
       </p>
+      {rows.some((r) => r.adjustment_points !== 0) && (
+        <ul style={{ margin: '6px 0 0', padding: 0, listStyle: 'none', fontSize: 13, color: 'var(--color-texto-2)' }}>
+          {rows
+            .filter((r) => r.adjustment_points !== 0)
+            .map((r) => (
+              <li key={r.team.id}>
+                <span style={{ color: 'var(--color-error)' }}>*</span> {r.team.name}:{' '}
+                {signed(r.adjustment_points)} pts
+                {r.adjustment_reasons.length > 0 && ` (${r.adjustment_reasons.join('; ')})`}
+              </li>
+            ))}
+        </ul>
+      )}
     </>
   )
 }
