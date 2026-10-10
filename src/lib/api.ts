@@ -1,7 +1,7 @@
 import { ApiError } from './errors'
 import { supabase } from './supabase'
 
-const BASE = `${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}/api/v1`
+export const BASE = `${import.meta.env.VITE_API_URL ?? 'http://localhost:8000'}/api/v1`
 
 type Query = Record<string, string | number | boolean | undefined | null>
 
@@ -83,6 +83,33 @@ async function request<T>(
   return (payload ?? undefined) as T
 }
 
+export interface DownloadedFile {
+  blob: Blob
+  /** Nombre que sugiere el servidor (Content-Disposition), si lo manda. */
+  fileName: string | null
+}
+
+/** GET de un archivo (p. ej. un .xlsx) con la sesión del usuario. */
+async function download(path: string, opts: RequestOptions = {}): Promise<DownloadedFile> {
+  const res = await fetch(buildUrl(path, opts.query), {
+    headers: await authHeader(opts.auth),
+    signal: opts.signal,
+  })
+  if (!res.ok) {
+    const raw = await res.text()
+    let payload: unknown = raw || `Error ${res.status}`
+    try {
+      payload = JSON.parse(raw)
+    } catch {
+      // cuerpo no-JSON: se conserva el texto
+    }
+    throw new ApiError(res.status, payload)
+  }
+  const disposition = res.headers.get('Content-Disposition') ?? ''
+  const fileName = /filename="?([^";]+)"?/.exec(disposition)?.[1] ?? null
+  return { blob: await res.blob(), fileName }
+}
+
 export const api = {
   get: <T>(path: string, opts?: RequestOptions) => request<T>('GET', path, opts),
   post: <T>(path: string, body?: unknown, opts?: RequestOptions) =>
@@ -95,4 +122,15 @@ export const api = {
     request<T>('DELETE', path, opts),
   upload: <T>(path: string, form: FormData, opts?: RequestOptions) =>
     request<T>('POST', path, { ...opts, form }),
+  download,
+}
+
+/** Ofrece al navegador guardar un archivo descargado. */
+export function saveFile({ blob, fileName }: DownloadedFile, fallbackName: string) {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName ?? fallbackName
+  link.click()
+  URL.revokeObjectURL(url)
 }
