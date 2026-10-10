@@ -1,9 +1,7 @@
 import { useMemo, useState } from 'react'
-import { Plus, Pencil, Trash2, ClipboardCheck, BarChart3 } from 'lucide-react'
+import { Plus, Pencil, Trash2, ClipboardCheck, BarChart3, FileSpreadsheet } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import type { Match, MatchStatus } from '@/types/api'
-import { useMatches, useRounds } from '@/features/schedule/queries'
-import { useDeleteMatch } from '@/features/matches/mutations'
+
 import { useTournamentTeams } from '@/features/teams/queries'
 import { MatchForm } from '@/components/organisms/MatchForm'
 import { ResultForm } from '@/components/organisms/ResultForm'
@@ -15,7 +13,7 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
-import { useConfirmMutate } from '@/components/molecules/ConfirmDialog'
+
 import { indexById } from '@/lib/collections'
 import { formatDateTime } from '@/lib/format'
 
@@ -40,7 +38,7 @@ export function MatchesPanel({ tournamentId }: { tournamentId: string }) {
   })
   const teams = useTournamentTeams(tournamentId)
   const del = useDeleteMatch(tournamentId)
-  const confirmMutate = useConfirmMutate()
+
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Match | undefined>(undefined)
   const [scoring, setScoring] = useState<Match | null>(null)
@@ -158,6 +156,16 @@ export function MatchesPanel({ tournamentId }: { tournamentId: string }) {
                     <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end', alignItems: 'center' }}>
                       <Button size="sm" variant="outline" onClick={() => setScoring(m)}>
                         <ClipboardCheck size={14} /> {played(m) ? 'Corregir resultado' : 'Resultado'}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => sheet.mutate(m.id, { onError: alertOnError })}
+                        disabled={sheet.isPending && sheet.variables === m.id}
+                        aria-label="Descargar cédula de referees"
+                        title="Cédula de referees (Excel)"
+                      >
+                        <FileSpreadsheet size={14} />
                       </Button>
                       <Link
                         to={`/admin/torneos/${tournamentId}/partidos/${m.id}/estadisticas`}
