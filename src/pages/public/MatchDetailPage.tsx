@@ -7,8 +7,10 @@ import { TeamBadge } from '@/components/molecules/TeamBadge'
 import { MatchStatusPill } from '@/components/molecules/StatusPill'
 import { EmptyState, ErrorState, NotFoundState } from '@/components/molecules/StateView'
 import { CardsSkeleton } from '@/components/molecules/Skeletons'
+import { StatTablesLayout } from '@/components/molecules/StatTablesLayout'
 import { Skeleton } from '@/components/atoms/Skeleton'
 import { ApiError } from '@/lib/errors'
+import { usePageTitle } from '@/lib/usePageTitle'
 import { formatDateTime } from '@/lib/format'
 
 type TeamLite = Pick<Team, 'id' | 'name' | 'logo_url'>
@@ -39,7 +41,7 @@ function TeamStatTable({
 }) {
   const rows = players.filter((p) => statsByPlayer.has(p.id))
   return (
-    <section style={{ flex: '1 1 520px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <section style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <TeamBadge name={team?.name ?? 'Equipo'} logoUrl={team?.logo_url} showName={false} size={40} />
         <h3 style={{ fontSize: 18, lineHeight: '24px', fontWeight: 600, margin: 0 }}>
@@ -49,9 +51,10 @@ function TeamStatTable({
       {rows.length === 0 ? (
         <p style={{ color: 'var(--color-texto-2)' }}>Sin estadísticas capturadas.</p>
       ) : (
+       <div className="stat-scroll">
         <div
+          className="stat-scroll__x"
           style={{
-            overflowX: 'auto',
             background: 'var(--color-superficie)',
             border: '1px solid var(--color-borde)',
             borderRadius: 'var(--radius-md)',
@@ -117,6 +120,7 @@ function TeamStatTable({
             })}
           </div>
         </div>
+       </div>
       )}
     </section>
   )
@@ -132,6 +136,11 @@ export function MatchDetailPage() {
   const statsByPlayer = useMemo(
     () => new Map((stats.data ?? []).map((s) => [s.player_id, s])),
     [stats.data],
+  )
+  usePageTitle(
+    match.data
+      ? `${match.data.home_team?.name ?? 'Local'} vs ${match.data.away_team?.name ?? 'Visita'}`
+      : null,
   )
 
   if (match.isLoading)
@@ -233,10 +242,12 @@ export function MatchDetailPage() {
           message="Las estadísticas de los jugadores aparecerán cuando se capturen."
         />
       ) : (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24 }}>
-          <TeamStatTable team={home} players={homePlayers.data ?? []} statsByPlayer={statsByPlayer} />
-          <TeamStatTable team={away} players={awayPlayers.data ?? []} statsByPlayer={statsByPlayer} />
-        </div>
+        <StatTablesLayout
+          homeLabel={home?.name ?? 'Local'}
+          awayLabel={away?.name ?? 'Visita'}
+          home={<TeamStatTable team={home} players={homePlayers.data ?? []} statsByPlayer={statsByPlayer} />}
+          away={<TeamStatTable team={away} players={awayPlayers.data ?? []} statsByPlayer={statsByPlayer} />}
+        />
       )}
     </div>
   )

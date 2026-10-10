@@ -15,7 +15,8 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
-import { alertOnError, confirmAndMutate } from '@/lib/mutationHelpers'
+import { alertOnError } from '@/lib/mutationHelpers'
+import { useConfirmMutate } from '@/components/molecules/ConfirmDialog'
 
 /** Gestión de plantilla del club (RF-41): alta, edición, baja y eliminación.
  *  `extraActions` permite inyectar acciones adicionales por jugador (ej. transferir, solo admin). */
@@ -29,6 +30,7 @@ export function RosterManager({
   const players = useClubPlayers(clubId)
   const update = useUpdatePlayer(clubId)
   const del = useDeletePlayer(clubId)
+  const confirmMutate = useConfirmMutate()
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Player | undefined>(undefined)
   const [showInactive, setShowInactive] = useState(false)
@@ -42,11 +44,12 @@ export function RosterManager({
     )
 
   const remove = (p: Player) =>
-    confirmAndMutate(
+    confirmMutate(
       `¿Eliminar a ${p.full_name}?\n\nSe borran también todas sus estadísticas. ` +
         `Si solo quieres liberarlo, usa "Dar de baja".`,
       del,
       p.id,
+      { confirmLabel: 'Eliminar jugador' },
     )
 
   return (
@@ -118,18 +121,21 @@ export function RosterManager({
                         variant="ghost"
                         onClick={() => deactivate(p)}
                         disabled={update.isPending}
-                        title={p.is_active ? 'Dar de baja' : 'Reactivar'}
+                        aria-label={`${p.is_active ? 'Dar de baja a' : 'Reactivar a'} ${p.full_name}`}
+                        data-tooltip={p.is_active ? 'Dar de baja' : 'Reactivar'}
                       >
                         {p.is_active ? <UserMinus size={14} /> : <UserCheck size={14} />}
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
+                        className="actions-sep"
                         onClick={() => remove(p)}
                         disabled={del.isPending}
                         aria-label={`Eliminar ${p.full_name}`}
+                        data-tooltip="Eliminar"
                       >
-                        <Trash2 size={14} color="var(--loss)" />
+                        <Trash2 size={14} color="var(--color-error)" />
                       </Button>
                     </div>
                   </td>

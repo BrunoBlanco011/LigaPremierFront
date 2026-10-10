@@ -7,6 +7,7 @@ import { FormField } from '@/components/molecules/FormField'
 import { PasswordField } from '@/components/molecules/PasswordField'
 import { Button } from '@/components/atoms/Button'
 import { Alert } from '@/components/molecules/Alert'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 interface LoginForm {
   email: string
@@ -14,6 +15,7 @@ interface LoginForm {
 }
 
 export function LoginPage() {
+  usePageTitle('Iniciar sesión')
   const { signIn } = useAuth()
   const navigate = useNavigate()
   const [serverError, setServerError] = useState<string | null>(null)

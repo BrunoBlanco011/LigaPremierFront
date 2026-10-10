@@ -12,22 +12,27 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
-import { friendlyMessage } from '@/lib/errors'
+import { useConfirm } from '@/components/molecules/ConfirmDialog'
+import { alertOnError } from '@/lib/mutationHelpers'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 export function AdminUsersPage() {
+  usePageTitle('Usuarios · Admin')
   const users = useUsers()
   const del = useDeleteUser()
   const { user: me } = useAuth()
+  const confirm = useConfirm()
   const [open, setOpen] = useState(false)
 
-  const remove = (u: User) => {
-    if (u.id === me?.id) {
-      window.alert('No puedes eliminar tu propia cuenta.')
-      return
-    }
-    if (window.confirm(`¿Eliminar a ${u.full_name ?? u.email}?`)) {
-      del.mutate(u.id, { onError: (e) => window.alert(friendlyMessage(e)) })
-    }
+  const remove = async (u: User) => {
+    if (u.id === me?.id) return
+    const ok = await confirm({
+      title: `¿Eliminar a ${u.full_name ?? u.email}?`,
+      body: 'Perderá el acceso al panel. Esta acción no se puede deshacer.',
+      confirmLabel: 'Eliminar usuario',
+      danger: true,
+    })
+    if (ok) del.mutate(u.id, { onError: alertOnError })
   }
 
   return (

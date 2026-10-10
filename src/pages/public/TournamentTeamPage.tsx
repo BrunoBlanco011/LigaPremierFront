@@ -15,11 +15,13 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 /** Perfil de un equipo (inscripción) dentro de un torneo (RF-17). */
 export function TournamentTeamPage() {
   const { id = '', teamId = '' } = useParams()
   const team = useTeam(teamId)
+  usePageTitle(team.data?.name ?? null)
   const players = useTeamPlayers(teamId)
   const matches = useMatches(id, { teamId })
   const allTeams = useTournamentTeams(id)

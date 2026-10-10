@@ -56,7 +56,7 @@ export function GenerateScheduleForm({
       match_duration_minutes: Number(values.match_duration_minutes) || 60,
       max_matches_per_day: Number(values.max_matches_per_day) || null,
       venue: values.venue.trim() || null,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      timezone: 'America/Mexico_City',
       double_round: values.double_round,
       replace_existing: replace,
     }

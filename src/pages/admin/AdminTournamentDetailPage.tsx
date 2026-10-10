@@ -8,8 +8,8 @@ import { FinancePanel } from '@/components/organisms/FinancePanel'
 import { StatSheetPage } from '@/pages/admin/StatSheetPage'
 import { TabNav } from '@/components/organisms/TabNav'
 import type { TabItem } from '@/components/organisms/TabNav'
-import { Placeholder } from '@/components/molecules/Placeholder'
 import { ErrorState, LoadingState } from '@/components/molecules/StateView'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 /**
  * Detalle del torneo en admin. La pestaña "Equipos" ya inscribe clubes (RF-22b).
@@ -21,13 +21,14 @@ export function AdminTournamentDetailPage() {
 
   const base = `/admin/torneos/${id}`
   const tabs: TabItem[] = [
-    { to: base, label: 'Resumen', end: true },
     { to: `${base}/equipos`, label: 'Equipos' },
     { to: `${base}/rol-de-juegos`, label: 'Rol de juegos' },
     { to: `${base}/partidos`, label: 'Partidos' },
     { to: `${base}/tabla`, label: 'Tabla' },
     { to: `${base}/finanzas`, label: 'Finanzas' },
   ]
+
+  usePageTitle(tournament.data ? `${tournament.data.name} · Admin` : null)
 
   if (tournament.isLoading) return <LoadingState />
   if (tournament.isError || !tournament.data)
@@ -42,7 +43,7 @@ export function AdminTournamentDetailPage() {
       <TabNav tabs={tabs} />
       <div style={{ marginTop: 24 }}>
         <Routes>
-          <Route index element={<Placeholder title="Resumen del torneo" rf="RF-11" />} />
+          <Route index element={<Navigate to="equipos" replace />} />
           <Route path="equipos" element={<InscriptionPanel tournamentId={id} />} />
           <Route path="rol-de-juegos" element={<SchedulePanel tournamentId={id} />} />
           <Route path="partidos" element={<MatchesPanel tournamentId={id} />} />

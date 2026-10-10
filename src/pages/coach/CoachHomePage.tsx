@@ -6,9 +6,11 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 /** RF-40: mis clubes. */
 export function CoachHomePage() {
+  usePageTitle('Mis clubes')
   const clubs = useMyClubs()
 
   return (

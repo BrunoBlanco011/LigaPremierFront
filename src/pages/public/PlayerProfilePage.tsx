@@ -2,10 +2,12 @@ import { Link, useParams } from 'react-router-dom'
 import { usePlayer, usePlayerStats } from '@/features/players/queries'
 import { StatCard } from '@/components/molecules/StatCard'
 import { ErrorState, LoadingState } from '@/components/molecules/StateView'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 export function PlayerProfilePage() {
   const { id = '' } = useParams()
   const player = usePlayer(id)
+  usePageTitle(player.data?.full_name ?? null)
   const stats = usePlayerStats(id)
 
   if (player.isLoading) return <div className="container page"><LoadingState /></div>

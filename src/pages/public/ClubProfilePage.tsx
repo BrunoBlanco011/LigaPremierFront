@@ -10,11 +10,13 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 /** Perfil e historial de un club (RF-17b). */
 export function ClubProfilePage() {
   const { id = '' } = useParams()
   const club = useClub(id)
+  usePageTitle(club.data?.name ?? null)
   const players = useClubPlayers(id)
   const history = useClubHistory(id)
 

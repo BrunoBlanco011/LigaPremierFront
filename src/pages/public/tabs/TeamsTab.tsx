@@ -4,9 +4,11 @@ import { useTournamentTeams } from '@/features/teams/queries'
 import { TeamBadge } from '@/components/molecules/TeamBadge'
 import { EmptyState, ErrorState } from '@/components/molecules/StateView'
 import { CardsSkeleton } from '@/components/molecules/Skeletons'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 export function TeamsTab() {
-  const { tournamentId } = useOutletContext<TournamentContext>()
+  const { tournamentId, tournamentName } = useOutletContext<TournamentContext>()
+  usePageTitle(`Equipos · ${tournamentName}`)
   const teams = useTournamentTeams(tournamentId)
 
   if (teams.isLoading) return <CardsSkeleton count={6} />

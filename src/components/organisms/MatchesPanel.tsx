@@ -14,7 +14,7 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
-import { confirmAndMutate } from '@/lib/mutationHelpers'
+import { useConfirmMutate } from '@/components/molecules/ConfirmDialog'
 import { indexById } from '@/lib/collections'
 import { formatDateTime } from '@/lib/format'
 
@@ -23,6 +23,7 @@ export function MatchesPanel({ tournamentId }: { tournamentId: string }) {
   const matches = useMatches(tournamentId)
   const teams = useTournamentTeams(tournamentId)
   const del = useDeleteMatch(tournamentId)
+  const confirmMutate = useConfirmMutate()
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Match | undefined>(undefined)
   const [scoring, setScoring] = useState<Match | null>(null)
@@ -31,7 +32,12 @@ export function MatchesPanel({ tournamentId }: { tournamentId: string }) {
   const teamName = (id: string) => teamsById.get(id)?.name ?? '—'
 
   const remove = (m: Match) =>
-    confirmAndMutate('¿Eliminar este partido?', del, m.id)
+    confirmMutate(
+      `¿Eliminar ${teamName(m.home_team_id)} vs ${teamName(m.away_team_id)}?\n\nSe borra el marcador y las estadísticas capturadas.`,
+      del,
+      m.id,
+      { confirmLabel: 'Eliminar partido' },
+    )
 
   const played = (m: Match) => m.status === 'finished' || m.status === 'forfeit'
 
@@ -71,12 +77,12 @@ export function MatchesPanel({ tournamentId }: { tournamentId: string }) {
               </tr>
             </thead>
             <tbody>
-              {matches.data.map((m) => (
+              {matches.data.map((m) => {
+                const label = `${teamName(m.home_team_id)} vs ${teamName(m.away_team_id)}`
+                return (
                 <tr key={m.id}>
                   <td style={{ fontWeight: 600 }}>
-                    <Link to={`/torneos/${tournamentId}/partidos/${m.id}`}>
-                      {teamName(m.home_team_id)} vs {teamName(m.away_team_id)}
-                    </Link>
+                    <Link to={`/torneos/${tournamentId}/partidos/${m.id}`}>{label}</Link>
                   </td>
                   <td style={{ fontWeight: 400 }}>{formatDateTime(m.scheduled_at)}</td>
                   <td><MatchStatusPill status={m.status} /></td>
@@ -84,14 +90,15 @@ export function MatchesPanel({ tournamentId }: { tournamentId: string }) {
                     {played(m) ? `${m.home_score} – ${m.away_score}` : '—'}
                   </td>
                   <td>
-                    <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end', alignItems: 'center' }}>
                       <Button size="sm" variant="outline" onClick={() => setScoring(m)}>
-                        <ClipboardCheck size={14} /> Resultado
+                        <ClipboardCheck size={14} /> {played(m) ? 'Corregir resultado' : 'Resultado'}
                       </Button>
                       <Link
                         to={`/admin/torneos/${tournamentId}/partidos/${m.id}/estadisticas`}
                         className="btn btn--ghost btn--sm"
-                        aria-label="Capturar estadísticas"
+                        aria-label={`Capturar estadísticas · ${label}`}
+                        data-tooltip="Capturar estadísticas"
                       >
                         <BarChart3 size={14} />
                       </Link>
@@ -102,23 +109,27 @@ export function MatchesPanel({ tournamentId }: { tournamentId: string }) {
                           setEditing(m)
                           setFormOpen(true)
                         }}
-                        aria-label="Editar partido"
+                        aria-label={`Editar ${label}`}
+                        data-tooltip="Editar"
                       >
                         <Pencil size={14} />
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
+                        className="actions-sep"
                         onClick={() => remove(m)}
                         disabled={del.isPending}
-                        aria-label="Eliminar partido"
+                        aria-label={`Eliminar ${label}`}
+                        data-tooltip="Eliminar"
                       >
-                        <Trash2 size={14} color="var(--loss)" />
+                        <Trash2 size={14} color="var(--color-error)" />
                       </Button>
                     </div>
                   </td>
                 </tr>
-              ))}
+                )
+              })}
             </tbody>
           </table>
         </div>

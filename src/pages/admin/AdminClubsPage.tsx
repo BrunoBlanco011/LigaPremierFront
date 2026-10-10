@@ -12,20 +12,24 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
-import { confirmAndMutate } from '@/lib/mutationHelpers'
+import { useConfirmMutate } from '@/components/molecules/ConfirmDialog'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 export function AdminClubsPage() {
+  usePageTitle('Clubes · Admin')
   const clubs = useClubs()
   const del = useDeleteClub()
+  const confirmMutate = useConfirmMutate()
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Club | undefined>(undefined)
 
   const onDelete = (c: Club) =>
-    confirmAndMutate(
+    confirmMutate(
       `¿Eliminar el club "${c.name}"?\n\nSolo se permite si nunca se ha inscrito ` +
         `a un torneo (para no perder el historial).`,
       del,
       c.id,
+      { confirmLabel: 'Eliminar club' },
     )
 
   return (

@@ -13,6 +13,7 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 const CATEGORIES: LeaderSort[] = [
   'touchdowns',
@@ -26,7 +27,8 @@ const CATEGORIES: LeaderSort[] = [
 const valueOf = (row: PlayerTotals, sort: LeaderSort) => row[sort]
 
 export function StatsTab() {
-  const { tournamentId } = useOutletContext<TournamentContext>()
+  const { tournamentId, tournamentName } = useOutletContext<TournamentContext>()
+  usePageTitle(`Estadísticas · ${tournamentName}`)
   const [sort, setSort] = useState<LeaderSort>('touchdowns')
   const leaders = useLeaders(tournamentId, sort)
 

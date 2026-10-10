@@ -6,6 +6,7 @@ import { useMatches, useRounds } from '@/features/schedule/queries'
 import { MatchCard } from '@/components/organisms/MatchCard'
 import { EmptyState, ErrorState } from '@/components/molecules/StateView'
 import { MatchesSkeleton } from '@/components/molecules/Skeletons'
+import { usePageTitle } from '@/lib/usePageTitle'
 import { formatDateRange } from '@/lib/format'
 
 const dayFmt = new Intl.DateTimeFormat('es-MX', {
@@ -16,7 +17,8 @@ const dayFmt = new Intl.DateTimeFormat('es-MX', {
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
 export function ScheduleTab() {
-  const { tournamentId, teamsById } = useOutletContext<TournamentContext>()
+  const { tournamentId, tournamentName, teamsById } = useOutletContext<TournamentContext>()
+  usePageTitle(`Rol de juegos · ${tournamentName}`)
   const rounds = useRounds(tournamentId)
   const matches = useMatches(tournamentId)
   const [selected, setSelected] = useState<string | null>(null)

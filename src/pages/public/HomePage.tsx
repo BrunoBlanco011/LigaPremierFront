@@ -12,11 +12,13 @@ import { ResultsTicker } from '@/components/organisms/ResultsTicker'
 import { TeamBadge } from '@/components/molecules/TeamBadge'
 import { EmptyState, ErrorState } from '@/components/molecules/StateView'
 import { CardsSkeleton, ChipsSkeleton } from '@/components/molecules/Skeletons'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 const roundLabel = (m?: Match) =>
   m?.round?.name ?? (m?.round?.number != null ? `Jornada ${m.round.number}` : '')
 
 export function HomePage() {
+  usePageTitle()
   const active = useTournaments('active')
   const clubs = useClubs()
   const primary = active.data?.[0]

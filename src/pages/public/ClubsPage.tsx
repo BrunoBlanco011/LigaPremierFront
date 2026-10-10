@@ -5,9 +5,11 @@ import { FieldBand } from '@/components/molecules/FieldBand'
 import { SkewTag } from '@/components/atoms/SkewTag'
 import { EmptyState, ErrorState } from '@/components/molecules/StateView'
 import { ChipsSkeleton } from '@/components/molecules/Skeletons'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 /** Clubes de la liga (RF-17b). */
 export function ClubsPage() {
+  usePageTitle('Clubes')
   const clubs = useClubs()
 
   return (

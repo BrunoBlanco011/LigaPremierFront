@@ -10,7 +10,7 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
-import { confirmAndMutate } from '@/lib/mutationHelpers'
+import { useConfirmMutate } from '@/components/molecules/ConfirmDialog'
 import { indexById } from '@/lib/collections'
 import { formatDateRange } from '@/lib/format'
 
@@ -20,6 +20,7 @@ export function SchedulePanel({ tournamentId }: { tournamentId: string }) {
   const matches = useMatches(tournamentId)
   const teams = useTournamentTeams(tournamentId)
   const delRound = useDeleteRound(tournamentId)
+  const confirmMutate = useConfirmMutate()
   const [genOpen, setGenOpen] = useState(false)
 
   const teamsById = useMemo(() => indexById(teams.data), [teams.data])
@@ -32,10 +33,11 @@ export function SchedulePanel({ tournamentId }: { tournamentId: string }) {
   }, [matches.data])
 
   const removeRound = (id: string, label: string) =>
-    confirmAndMutate(
+    confirmMutate(
       `¿Eliminar "${label}"?\n\nSus partidos no se borran: quedan sin jornada asignada.`,
       delRound,
       id,
+      { confirmLabel: 'Eliminar jornada' },
     )
 
   return (
@@ -84,9 +86,10 @@ export function SchedulePanel({ tournamentId }: { tournamentId: string }) {
                         variant="ghost"
                         onClick={() => removeRound(r.id, r.name ?? `Jornada ${r.number}`)}
                         disabled={delRound.isPending}
-                        aria-label="Eliminar jornada"
+                        aria-label={`Eliminar ${r.name ?? `Jornada ${r.number}`}`}
+                        data-tooltip="Eliminar"
                       >
-                        <Trash2 size={14} color="var(--loss)" />
+                        <Trash2 size={14} color="var(--color-error)" />
                       </Button>
                     </div>
                   </td>

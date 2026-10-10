@@ -11,6 +11,7 @@ import { FormField } from '@/components/molecules/FormField'
 import { Button } from '@/components/atoms/Button'
 import { Alert } from '@/components/molecules/Alert'
 import { FootballSpinner } from '@/components/atoms/FootballSpinner'
+import { usePageTitle } from '@/lib/usePageTitle'
 import { formatDateTime } from '@/lib/format'
 
 interface FormValues {
@@ -37,6 +38,8 @@ export function JoinTeamPage() {
     min: { value: 0, message: 'Entre 0 y 999' },
     max: { value: 999, message: 'Entre 0 y 999' },
   })
+
+  usePageTitle(invite.data ? `Únete a ${invite.data.club.name}` : 'Unirse')
 
   const onSubmit = handleSubmit(async (values) => {
     setFormError(null)

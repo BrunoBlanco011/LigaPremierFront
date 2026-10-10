@@ -5,9 +5,11 @@ import { useMatches } from '@/features/schedule/queries'
 import { MatchCard } from '@/components/organisms/MatchCard'
 import { EmptyState, ErrorState } from '@/components/molecules/StateView'
 import { MatchesSkeleton } from '@/components/molecules/Skeletons'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 export function ResultsTab() {
-  const { tournamentId, teamsById } = useOutletContext<TournamentContext>()
+  const { tournamentId, tournamentName, teamsById } = useOutletContext<TournamentContext>()
+  usePageTitle(`Resultados · ${tournamentName}`)
   const matches = useMatches(tournamentId)
 
   const finished = useMemo(

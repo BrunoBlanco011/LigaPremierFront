@@ -8,12 +8,14 @@ import { LogoUploader } from '@/components/organisms/LogoUploader'
 import { InviteButton } from '@/components/organisms/InviteButton'
 import { Button } from '@/components/atoms/Button'
 import { ErrorState, LoadingState } from '@/components/molecules/StateView'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 /** Panel del coach: administra su club (datos, logo, roster) y genera links de alta. */
 export function CoachRosterPage() {
   const { id = '' } = useParams()
   const club = useClub(id)
   const [editOpen, setEditOpen] = useState(false)
+  usePageTitle(club.data ? `${club.data.name} · Mi club` : null)
 
   if (club.isLoading) return <LoadingState />
   if (club.isError || !club.data)

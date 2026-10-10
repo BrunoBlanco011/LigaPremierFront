@@ -12,12 +12,15 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
-import { confirmAndMutate } from '@/lib/mutationHelpers'
+import { useConfirmMutate } from '@/components/molecules/ConfirmDialog'
 import { formatDate } from '@/lib/format'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 export function AdminTournamentsPage() {
+  usePageTitle('Torneos · Admin')
   const tournaments = useTournaments()
   const del = useDeleteTournament()
+  const confirmMutate = useConfirmMutate()
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Tournament | undefined>(undefined)
 
@@ -31,12 +34,13 @@ export function AdminTournamentsPage() {
   }
 
   const onDelete = (t: Tournament) =>
-    confirmAndMutate(
+    confirmMutate(
       `¿Eliminar "${t.name}"?\n\nEsto borra en cascada las inscripciones, jornadas, ` +
         `partidos, estadísticas y finanzas del torneo. Los clubes y sus jugadores se ` +
         `conservan. Considera cambiar el estado a "Cancelado" o "Finalizado" en su lugar.`,
       del,
       t.id,
+      { confirmLabel: 'Eliminar torneo' },
     )
 
   return (

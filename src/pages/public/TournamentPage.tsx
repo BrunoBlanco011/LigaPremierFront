@@ -13,6 +13,7 @@ import { ApiError } from '@/lib/errors'
 
 export interface TournamentContext {
   tournamentId: string
+  tournamentName: string
   teamsById: Map<string, Team>
 }
 
@@ -65,7 +66,7 @@ export function TournamentPage() {
   }
 
   const t = tournament.data
-  const context: TournamentContext = { tournamentId: id, teamsById }
+  const context: TournamentContext = { tournamentId: id, tournamentName: t.name, teamsById }
 
   return (
     <>

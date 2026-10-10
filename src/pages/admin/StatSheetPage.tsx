@@ -7,14 +7,17 @@ import { useTeam, useTeamPlayers } from '@/features/teams/queries'
 import { usePutMatchStats } from '@/features/stats/mutations'
 import { Button } from '@/components/atoms/Button'
 import { ErrorState, LoadingState } from '@/components/molecules/StateView'
+import { StatTablesLayout } from '@/components/molecules/StatTablesLayout'
 import { friendlyMessage } from '@/lib/errors'
+import { usePageTitle } from '@/lib/usePageTitle'
 
-const COLS: { key: keyof Omit<PlayerStat, 'player_id' | 'attended'>; label: string }[] = [
-  { key: 'touchdowns', label: 'Anot.' },
-  { key: 'td_passes', label: 'Pases TD' },
-  { key: 'interceptions', label: 'Int' },
-  { key: 'sacks', label: 'Cap' },
-  { key: 'tackles', label: 'Tk' },
+type StatKey = keyof Omit<PlayerStat, 'player_id' | 'attended'>
+const COLS: { key: StatKey; label: string }[] = [
+  { key: 'touchdowns', label: 'Anotaciones' },
+  { key: 'td_passes', label: 'Pases de anotación' },
+  { key: 'interceptions', label: 'Intercepciones' },
+  { key: 'sacks', label: 'Capturas' },
+  { key: 'tackles', label: 'Tackles' },
 ]
 
 const blank = (playerId: string): PlayerStat => ({
@@ -42,6 +45,10 @@ export function StatSheetPage() {
   const [edits, setEdits] = useState<Map<string, PlayerStat>>(new Map())
   const [saved, setSaved] = useState(false)
 
+  usePageTitle(
+    home.data && away.data ? `Captura · ${home.data.name} vs ${away.data.name}` : 'Captura',
+  )
+
   const allPlayers = useMemo(
     () => [...(homePlayers.data ?? []), ...(awayPlayers.data ?? [])],
     [homePlayers.data, awayPlayers.data],
@@ -67,7 +74,12 @@ export function StatSheetPage() {
   }
 
   const onSave = () => {
-    const rows = allPlayers.map((p) => valueOf(p.id))
+    // Si no asistió, sus valores se ignoran (se guardan en cero).
+    const rows = allPlayers.map((p) => {
+      const v = valueOf(p.id)
+      if (v.attended) return v
+      return { ...v, touchdowns: 0, td_passes: 0, interceptions: 0, sacks: 0, tackles: 0 }
+    })
     save.mutate(rows, {
       onSuccess: () => setSaved(true),
       onError: (e) => window.alert(friendlyMessage(e)),
@@ -84,12 +96,13 @@ export function StatSheetPage() {
       {players.length === 0 ? (
         <p className="round__bye">Sin jugadores en la plantilla.</p>
       ) : (
-        <div className="table-wrap">
+        <div className="stat-scroll">
+         <div className="table-wrap stat-scroll__x">
           <table className="table tnum">
             <thead>
               <tr>
                 <th>Jugador</th>
-                <th className="num">Asist.</th>
+                <th className="num">Asistió</th>
                 {COLS.map((c) => <th key={c.key} className="num">{c.label}</th>)}
               </tr>
             </thead>
@@ -97,8 +110,11 @@ export function StatSheetPage() {
               {players.map((p) => {
                 const s = valueOf(p.id)
                 return (
-                  <tr key={p.id}>
-                    <td style={{ fontWeight: 600 }}>
+                  <tr
+                    key={p.id}
+                    style={{ background: s.attended ? undefined : 'var(--color-superficie-2)' }}
+                  >
+                    <td style={{ fontWeight: 600, color: s.attended ? undefined : 'var(--color-texto-2)' }}>
                       {p.jersey_number != null && (
                         <span style={{ color: 'var(--ink-faint)', marginRight: 6 }}>#{p.jersey_number}</span>
                       )}
@@ -118,7 +134,8 @@ export function StatSheetPage() {
                           style={{ width: 58, padding: '4px 6px', textAlign: 'center' }}
                           type="number"
                           min={0}
-                          value={s[c.key]}
+                          value={s.attended ? s[c.key] : 0}
+                          disabled={!s.attended}
                           onChange={(e) => update(p.id, { [c.key]: Number(e.target.value) })}
                         />
                       </td>
@@ -128,6 +145,7 @@ export function StatSheetPage() {
               })}
             </tbody>
           </table>
+         </div>
         </div>
       )}
     </div>
@@ -153,9 +171,13 @@ export function StatSheetPage() {
       {existing.isLoading || homePlayers.isLoading || awayPlayers.isLoading ? (
         <LoadingState />
       ) : (
-        <div className="grid grid--2" style={{ marginTop: 16 }}>
-          {renderTeam(home.data?.name ?? 'Local', homePlayers.data ?? [])}
-          {renderTeam(away.data?.name ?? 'Visitante', awayPlayers.data ?? [])}
+        <div style={{ marginTop: 16 }}>
+          <StatTablesLayout
+            homeLabel={home.data?.name ?? 'Local'}
+            awayLabel={away.data?.name ?? 'Visitante'}
+            home={renderTeam(home.data?.name ?? 'Local', homePlayers.data ?? [])}
+            away={renderTeam(away.data?.name ?? 'Visitante', awayPlayers.data ?? [])}
+          />
         </div>
       )}
     </>

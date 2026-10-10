@@ -112,7 +112,7 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
                   <td className="num"><MoneyText amount={r.other_charges} /></td>
                   <td className="num"><MoneyText amount={r.total_charges} /></td>
                   <td className="num"><MoneyText amount={r.payments} /></td>
-                  <td className="num"><MoneyText amount={r.balance} highlightDebt /></td>
+                  <td className="num"><MoneyText amount={r.balance} balance /></td>
                 </tr>
               ))}
             </tbody>
@@ -122,7 +122,7 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
                 <td colSpan={3} />
                 <td className="num"><MoneyText amount={summary.data.total_charges} /></td>
                 <td className="num"><MoneyText amount={summary.data.total_payments} /></td>
-                <td className="num"><MoneyText amount={summary.data.total_balance} highlightDebt /></td>
+                <td className="num"><MoneyText amount={summary.data.total_balance} balance /></td>
               </tr>
             </tfoot>
           </table>

@@ -1,5 +1,6 @@
 import { useOutletContext } from 'react-router-dom'
 import type { TournamentContext } from '../TournamentPage'
+import { usePageTitle } from '@/lib/usePageTitle'
 import { useStandings } from '@/features/standings/queries'
 import { StandingsTable } from '@/components/organisms/StandingsTable'
 import { StandingsPodium } from '@/components/organisms/StandingsPodium'
@@ -7,7 +8,8 @@ import { EmptyState, ErrorState } from '@/components/molecules/StateView'
 import { StandingsSkeleton } from '@/components/molecules/Skeletons'
 
 export function StandingsTab() {
-  const { tournamentId } = useOutletContext<TournamentContext>()
+  const { tournamentId, tournamentName } = useOutletContext<TournamentContext>()
+  usePageTitle(`Tabla · ${tournamentName}`)
   const standings = useStandings(tournamentId)
 
   if (standings.isLoading) return <StandingsSkeleton />

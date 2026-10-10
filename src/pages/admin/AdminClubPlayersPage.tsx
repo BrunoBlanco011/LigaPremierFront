@@ -7,11 +7,13 @@ import { RosterManager } from '@/components/organisms/RosterManager'
 import { TransferPlayerModal } from '@/components/organisms/TransferPlayerModal'
 import { Button } from '@/components/atoms/Button'
 import { ErrorState, LoadingState } from '@/components/molecules/StateView'
+import { usePageTitle } from '@/lib/usePageTitle'
 
 export function AdminClubPlayersPage() {
   const { id = '' } = useParams()
   const club = useClub(id)
   const [transferring, setTransferring] = useState<Player | null>(null)
+  usePageTitle(club.data ? `${club.data.name} · Plantilla` : null)
 
   if (club.isLoading) return <LoadingState />
   if (club.isError || !club.data)
@@ -38,7 +40,8 @@ export function AdminClubPlayersPage() {
             size="sm"
             variant="ghost"
             onClick={() => setTransferring(player)}
-            title="Transferir a otro club"
+            aria-label={`Transferir a ${player.full_name} a otro club`}
+            data-tooltip="Transferir"
           >
             <ArrowLeftRight size={14} />
           </Button>

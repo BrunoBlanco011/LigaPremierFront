@@ -54,6 +54,31 @@
 .btn--danger { background: var(--color-error); color: #fff; }
 .btn--danger:hover:not(:disabled) { background: #8f1c13; }
 
+/* Tooltip visible (hover y foco) para botones de solo ícono: el texto va en
+   data-tooltip y también en aria-label. Sirve en teclado; en táctil queda el
+   aria-label. */
+.btn[data-tooltip] { position: relative; }
+.btn[data-tooltip]:hover::after,
+.btn[data-tooltip]:focus-visible::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-noche);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  padding: 5px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+}
+/* Separador antes de la acción destructiva en una fila de acciones */
+.actions-sep { margin-left: 8px; padding-left: 8px; border-left: 1px solid var(--color-borde); }
+
 /* ── Inputs / Select / Textarea ────────────────────────────────── */
 .input {
   font: inherit;

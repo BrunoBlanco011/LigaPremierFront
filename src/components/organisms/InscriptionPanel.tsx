@@ -13,7 +13,8 @@ import {
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
-import { alertOnError, confirmAndMutate } from '@/lib/mutationHelpers'
+import { alertOnError } from '@/lib/mutationHelpers'
+import { useConfirmMutate } from '@/components/molecules/ConfirmDialog'
 
 /** Inscribir / dar de baja clubes en un torneo (RF-22b). */
 export function InscriptionPanel({ tournamentId }: { tournamentId: string }) {
@@ -21,6 +22,7 @@ export function InscriptionPanel({ tournamentId }: { tournamentId: string }) {
   const teams = useTournamentTeams(tournamentId)
   const enroll = useEnrollClubs(tournamentId)
   const remove = useRemoveEnrollment(tournamentId)
+  const confirmMutate = useConfirmMutate()
   const [checked, setChecked] = useState<Set<string>>(new Set())
 
   const enrolledClubIds = useMemo(
@@ -48,11 +50,12 @@ export function InscriptionPanel({ tournamentId }: { tournamentId: string }) {
   }
 
   const removeEnrollment = (teamId: string, name: string) =>
-    confirmAndMutate(
+    confirmMutate(
       `¿Dar de baja a "${name}" de este torneo?\n\nSe borran en cascada sus ` +
         `partidos, estadísticas y finanzas de este torneo (el club se conserva).`,
       remove,
       teamId,
+      { confirmLabel: 'Dar de baja' },
     )
 
   if (clubs.isLoading || teams.isLoading) return <LoadingState />
