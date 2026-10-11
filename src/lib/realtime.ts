@@ -9,6 +9,11 @@ const WS_URL = `${BASE.replace(/^http/, 'ws')}/ws`
 const DEBOUNCE_MS = 300
 const MAX_RETRY_MS = 30_000
 
+// El backend aún no expone el canal WebSocket (`/ws`). Mientras no exista, el
+// cliente queda apagado para no llenar la consola de errores de conexión.
+// Cuando el backend implemente el endpoint, pon VITE_ENABLE_REALTIME=true.
+const REALTIME_ENABLED = import.meta.env.VITE_ENABLE_REALTIME === 'true'
+
 interface RealtimeMessage {
   type: 'hello' | 'change' | 'pong'
 }
@@ -22,6 +27,7 @@ export function useRealtimeUpdates() {
   const queryClient = useQueryClient()
 
   useEffect(() => {
+    if (!REALTIME_ENABLED) return
     let socket: WebSocket | null = null
     let retryTimer: ReturnType<typeof setTimeout> | undefined
     let refreshTimer: ReturnType<typeof setTimeout> | undefined

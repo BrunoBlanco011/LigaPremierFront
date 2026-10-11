@@ -373,6 +373,21 @@
   margin-bottom: 24px;
   gap: 16px;
 }
+/* En móvil el encabezado se apila y los botones de acción envuelven, para que
+   no se salgan de la pantalla (p. ej. "Movimiento" en Finanzas). */
+@media (max-width: 640px) {
+  .dash__topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .dash__topbar > div {
+    flex-wrap: wrap;
+  }
+  .dash__topbar > div > .btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
 
 /* Login */
 .login-wrap {

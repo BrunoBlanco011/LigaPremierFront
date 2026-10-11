@@ -14,6 +14,14 @@ const FOCUSABLE =
 
 export function Modal({ title, onClose, children }: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
+  // `onClose` suele ser una arrow nueva en cada render del padre; guardamos la
+  // última en un ref para que el efecto de foco corra SOLO al montar/desmontar.
+  // Si dependiera de `onClose`, cada tecla reenfocaría el primer campo y solo
+  // dejaría escribir un carácter a la vez.
+  const onCloseRef = useRef(onClose)
+  useEffect(() => {
+    onCloseRef.current = onClose
+  })
 
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null
@@ -31,7 +39,7 @@ export function Modal({ title, onClose, children }: ModalProps) {
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onClose()
+        onCloseRef.current()
         return
       }
       if (e.key !== 'Tab') return
@@ -56,7 +64,8 @@ export function Modal({ title, onClose, children }: ModalProps) {
       document.removeEventListener('keydown', onKey)
       previouslyFocused?.focus?.()
     }
-  }, [onClose])
+    // Solo al montar/desmontar: el foco inicial y el trap no deben rehacerse en cada render.
+  }, [])
 
   return createPortal(
     <div className="modal-overlay" onClick={onClose} role="presentation">
