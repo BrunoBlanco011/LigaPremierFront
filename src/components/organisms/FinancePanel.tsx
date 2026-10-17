@@ -1,11 +1,12 @@
 import { Fragment, useMemo, useState } from 'react'
-import { ChevronDown, ChevronRight, Plus, CircleDollarSign, Trash2 } from 'lucide-react'
+import { ChevronDown, ChevronRight, Plus, CircleDollarSign, Pencil, Trash2 } from 'lucide-react'
 import type { FinanceMovement, FinanceMovementType } from '@/types/api'
 import { useFinanceMovements, useFinanceSummary } from '@/features/finance/queries'
 import {
   useChargeRegistration,
   useCreateMovement,
   useDeleteMovement,
+  useUpdateMovement,
 } from '@/features/finance/mutations'
 import { useTournamentTeams } from '@/features/teams/queries'
 import { MoneyText } from '@/components/molecules/MoneyText'
@@ -32,7 +33,10 @@ const MOVEMENT_TYPES: { value: FinanceMovementType; label: string }[] = [
 ]
 const TYPE_LABEL = Object.fromEntries(MOVEMENT_TYPES.map((t) => [t.value, t.label])) as Record<FinanceMovementType, string>
 
-const EMPTY_MOVEMENT = { team_id: '', type: 'payment' as FinanceMovementType, amount: '', description: '' }
+const EMPTY_MOVEMENT = { team_id: '', type: 'payment' as FinanceMovementType, amount: '', description: '', occurred_on: '' }
+
+// Fecha local (no UTC) para que no se adelante un día por la noche
+const todayIso = () => new Date().toLocaleDateString('en-CA')
 
 /** Estado de cuenta + movimientos del torneo (RF-29/30/31). */
 export function FinancePanel({ tournamentId }: { tournamentId: string }) {
@@ -41,6 +45,7 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
   const charge = useChargeRegistration(tournamentId)
   const create = useCreateMovement(tournamentId)
   const movements = useFinanceMovements(tournamentId)
+  const update = useUpdateMovement(tournamentId)
   const remove = useDeleteMovement(tournamentId)
   const confirmMutate = useConfirmMutate()
 
@@ -48,6 +53,7 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
   const [regAmount, setRegAmount] = useState('')
   const [movOpen, setMovOpen] = useState(false)
   const [mov, setMov] = useState(EMPTY_MOVEMENT)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
 
@@ -69,7 +75,21 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
 
   const openMovement = (teamId = '') => {
     setError(null)
-    setMov({ ...EMPTY_MOVEMENT, team_id: teamId })
+    setEditingId(null)
+    setMov({ ...EMPTY_MOVEMENT, team_id: teamId, occurred_on: todayIso() })
+    setMovOpen(true)
+  }
+
+  const openEdit = (m: FinanceMovement) => {
+    setError(null)
+    setEditingId(m.id)
+    setMov({
+      team_id: m.team_id,
+      type: m.type,
+      amount: m.amount,
+      description: m.description ?? '',
+      occurred_on: m.occurred_on,
+    })
     setMovOpen(true)
   }
 
@@ -84,20 +104,21 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
 
   const submitMovement = () => {
     setError(null)
-    if (!mov.team_id || !mov.amount) return setError('Completa equipo y monto.')
-    create.mutate(
-      {
-        team_id: mov.team_id,
-        type: mov.type,
-        amount: mov.amount,
-        description: mov.description.trim() || null,
-      },
-      {
-        onSuccess: () => { setMovOpen(false); setMov(EMPTY_MOVEMENT) },
-        onError: (e) => setError(friendlyMessage(e)),
-      },
-    )
+    if (!mov.team_id || !mov.amount || !mov.occurred_on) return setError('Completa equipo, monto y fecha.')
+    const fields = {
+      type: mov.type,
+      amount: mov.amount,
+      description: mov.description.trim() || null,
+      occurred_on: mov.occurred_on,
+    }
+    const callbacks = {
+      onSuccess: () => { setMovOpen(false); setMov(EMPTY_MOVEMENT); setEditingId(null) },
+      onError: (e: unknown) => setError(friendlyMessage(e)),
+    }
+    if (editingId) update.mutate({ id: editingId, ...fields }, callbacks)
+    else create.mutate({ team_id: mov.team_id, ...fields }, callbacks)
   }
+  const saving = create.isPending || update.isPending
 
   return (
     <>
@@ -197,7 +218,14 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
                                         {m.type === 'payment' ? '− ' : ''}
                                         <MoneyText amount={m.amount} />
                                       </td>
-                                      <td className="num">
+                                      <td className="num fin-detail__actions">
+                                        <Button
+                                          variant="ghost"
+                                          aria-label={`Editar ${TYPE_LABEL[m.type].toLowerCase()} de ${formatMoney(m.amount)}`}
+                                          onClick={() => openEdit(m)}
+                                        >
+                                          <Pencil size={16} />
+                                        </Button>
                                         <Button
                                           variant="ghost"
                                           aria-label={`Eliminar ${TYPE_LABEL[m.type].toLowerCase()} de ${formatMoney(m.amount)}`}
@@ -254,11 +282,16 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
 
       {/* Registrar movimiento (RF-31) */}
       {movOpen && (
-        <Modal title="Registrar movimiento" onClose={() => setMovOpen(false)}>
+        <Modal title={editingId ? 'Editar movimiento' : 'Registrar movimiento'} onClose={() => setMovOpen(false)}>
           {error && <div className="login-card__error">{error}</div>}
           <div className="field">
             <Label htmlFor="mov-team" required>Equipo</Label>
-            <Select id="mov-team" value={mov.team_id} onChange={(e) => setMov({ ...mov, team_id: e.target.value })}>
+            <Select
+              id="mov-team"
+              value={mov.team_id}
+              disabled={Boolean(editingId)}
+              onChange={(e) => setMov({ ...mov, team_id: e.target.value })}
+            >
               <option value="">Selecciona…</option>
               {teams.data?.map((t) => (
                 <option key={t.id} value={t.id}>{t.name}</option>
@@ -286,6 +319,12 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
             onChange={(e) => setMov({ ...mov, amount: e.target.value })}
           />
           <FormField
+            label="Fecha"
+            type="date"
+            value={mov.occurred_on}
+            onChange={(e) => setMov({ ...mov, occurred_on: e.target.value })}
+          />
+          <FormField
             label="Descripción"
             placeholder="Ej. Cambio de fecha, pierde por forfeit"
             value={mov.description}
@@ -293,8 +332,8 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
           />
           <div className="modal__foot">
             <Button variant="ghost" onClick={() => setMovOpen(false)}>Cancelar</Button>
-            <Button variant="primary" onClick={submitMovement} disabled={create.isPending}>
-              {create.isPending ? 'Guardando…' : 'Registrar'}
+            <Button variant="primary" onClick={submitMovement} disabled={saving}>
+              {saving ? 'Guardando…' : editingId ? 'Guardar cambios' : 'Registrar'}
             </Button>
           </div>
         </Modal>
