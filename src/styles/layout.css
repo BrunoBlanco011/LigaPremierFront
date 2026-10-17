@@ -1244,6 +1244,7 @@ summary.results-group__title::before {
 .fin-detail__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
 .fin-detail__empty { color: var(--color-texto-2); font-size: 14px; margin: 0; }
 .fin-detail__table { background: var(--color-superficie); }
+.fin-detail__actions { white-space: nowrap; }
 
 /* Tarjetas de totales del perfil de jugador: 3×2 escritorio, 2×3 móvil */
 .player-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }

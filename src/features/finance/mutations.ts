@@ -46,6 +46,19 @@ export function useCreateMovement(tournamentId: string) {
   })
 }
 
+export type MovementUpdate = Partial<Omit<MovementInput, 'team_id'>>
+
+/** Corrige un movimiento ya registrado (el equipo no se puede cambiar). */
+export function useUpdateMovement(tournamentId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, ...changes }: MovementUpdate & { id: string }) =>
+      api.patch<FinanceMovement>(`/finance/movements/${id}`, changes),
+    onSuccess: () => invalidate(qc, tournamentId),
+    meta: { successMessage: 'Movimiento actualizado' },
+  })
+}
+
 export function useDeleteMovement(tournamentId: string) {
   const qc = useQueryClient()
   return useMutation({
