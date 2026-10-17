@@ -8,6 +8,7 @@ import {
 } from '@/features/teams/queries'
 import { useMatches } from '@/features/schedule/queries'
 import { useStandings } from '@/features/standings/queries'
+import { useTeamPlayerStats } from '@/features/stats/queries'
 import { indexById } from '@/lib/collections'
 import { MatchCard } from '@/components/organisms/MatchCard'
 import { TeamBadge } from '@/components/molecules/TeamBadge'
@@ -28,6 +29,11 @@ export function TournamentTeamPage() {
   const standings = useStandings(id)
   const allTeams = useTournamentTeams(id)
   const teamsById = useMemo(() => indexById(allTeams.data), [allTeams.data])
+  const playerStats = useTeamPlayerStats(id, teamId)
+  const statsByPlayer = useMemo(
+    () => new Map((playerStats.data ?? []).map((s) => [s.player_id, s])),
+    [playerStats.data],
+  )
 
   const teamRow = useMemo(
     () => (standings.data ?? []).find((r) => r.team.id === teamId),
@@ -114,15 +120,30 @@ export function TournamentTeamPage() {
               <tr>
                 <th className="num">#</th>
                 <th>Jugador</th>
+                <th className="num">Asist.</th>
+                <th className="num">Anot.</th>
+                <th className="num">Pases TD</th>
+                <th className="num">Int</th>
+                <th className="num">Cap</th>
+                <th className="num">Tk</th>
               </tr>
             </thead>
             <tbody>
-              {roster.map((p) => (
-                <tr key={p.id}>
-                  <td className="num">{p.jersey_number ?? '—'}</td>
-                  <td><Link to={`/jugadores/${p.id}`}>{p.full_name}</Link></td>
-                </tr>
-              ))}
+              {roster.map((p) => {
+                const s = statsByPlayer.get(p.id)
+                return (
+                  <tr key={p.id}>
+                    <td className="num">{p.jersey_number ?? '—'}</td>
+                    <td><Link to={`/jugadores/${p.id}`}>{p.full_name}</Link></td>
+                    <td className="num">{s?.games_attended ?? 0}</td>
+                    <td className="num">{s?.touchdowns ?? 0}</td>
+                    <td className="num">{s?.td_passes ?? 0}</td>
+                    <td className="num">{s?.interceptions ?? 0}</td>
+                    <td className="num">{s?.sacks ?? 0}</td>
+                    <td className="num">{s?.tackles ?? 0}</td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>

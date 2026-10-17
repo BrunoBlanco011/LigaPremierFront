@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useMemo } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import type { PlayerTotals } from '@/types/api'
 import type { TournamentContext } from '../TournamentPage'
 import {
   LEADER_LABELS,
-  useLeaders,
+  useTournamentPlayerStats,
   type LeaderSort,
 } from '@/features/stats/queries'
 import { TeamBadge } from '@/components/molecules/TeamBadge'
@@ -24,55 +24,57 @@ const CATEGORIES: LeaderSort[] = [
   'games_attended',
 ]
 
-const valueOf = (row: PlayerTotals, sort: LeaderSort) => row[sort]
+const TOP = 5
+
+/** Los 5 mejores de una categoría; quien va en cero no cuenta como líder. */
+function topFive(rows: PlayerTotals[], sort: LeaderSort) {
+  return rows
+    .filter((r) => r[sort] > 0)
+    .sort((a, b) => b[sort] - a[sort] || a.full_name.localeCompare(b.full_name))
+    .slice(0, TOP)
+}
 
 export function StatsTab() {
   const { tournamentId, tournamentName } = useOutletContext<TournamentContext>()
-  usePageTitle(`Estadísticas · ${tournamentName}`)
-  const [sort, setSort] = useState<LeaderSort>('touchdowns')
-  const leaders = useLeaders(tournamentId, sort)
+  usePageTitle(`MVP · ${tournamentName}`)
+  const stats = useTournamentPlayerStats(tournamentId)
+  const leaders = useMemo(
+    () => CATEGORIES.map((c) => ({ category: c, rows: topFive(stats.data ?? [], c) })),
+    [stats.data],
+  )
+
+  if (stats.isLoading) return <LoadingState />
+  if (stats.isError) return <ErrorState error={stats.error} onRetry={() => stats.refetch()} />
+  if (leaders.every((l) => l.rows.length === 0))
+    return <EmptyState title="Sin estadísticas" message="Aún no hay datos en este torneo." />
 
   return (
-    <>
-      <div className="seg" role="tablist" aria-label="Categoría de líderes">
-        {CATEGORIES.map((c) => (
-          <button
-            key={c}
-            type="button"
-            role="tab"
-            aria-selected={sort === c}
-            className={`seg__btn${sort === c ? ' is-active' : ''}`}
-            onClick={() => setSort(c)}
-          >
-            {LEADER_LABELS[c]}
-          </button>
-        ))}
-      </div>
-
-      {leaders.isLoading ? (
-        <LoadingState />
-      ) : leaders.isError ? (
-        <ErrorState error={leaders.error} onRetry={() => leaders.refetch()} />
-      ) : !leaders.data || leaders.data.length === 0 ? (
-        <EmptyState title="Sin estadísticas" message="Aún no hay datos para esta categoría." />
-      ) : (
-        <div className="leaders tnum">
-          {leaders.data.map((row, i) => (
-            <div className="leader-row" key={row.player_id}>
-              <span className="leader-row__pos" aria-hidden="true">{i + 1}</span>
-              <TeamBadge name={row.team_name} logoUrl={null} showName={false} size={32} />
-              <div className="leader-row__who">
-                <Link to={`/jugadores/${row.player_id}`} className="leader-row__name">
-                  {row.jersey_number != null && <span className="leader-row__num">#{row.jersey_number}</span>}
-                  {row.full_name}
-                </Link>
-                <span className="leader-row__team">{row.team_name}</span>
-              </div>
-              <span className="marc leader-row__val">{valueOf(row, sort)}</span>
+    <div className="leaders-grid">
+      {leaders.map(({ category, rows }) => (
+        <section key={category} aria-labelledby={`mvp-${category}`}>
+          <h2 id={`mvp-${category}`} className="leaders__title">{LEADER_LABELS[category]}</h2>
+          {rows.length === 0 ? (
+            <EmptyState title="Sin datos" />
+          ) : (
+            <div className="leaders tnum">
+              {rows.map((row, i) => (
+                <div className="leader-row" key={row.player_id}>
+                  <span className="leader-row__pos" aria-hidden="true">{i + 1}</span>
+                  <TeamBadge name={row.team_name} logoUrl={null} showName={false} size={32} />
+                  <div className="leader-row__who">
+                    <Link to={`/jugadores/${row.player_id}`} className="leader-row__name">
+                      {row.jersey_number != null && <span className="leader-row__num">#{row.jersey_number}</span>}
+                      {row.full_name}
+                    </Link>
+                    <span className="leader-row__team">{row.team_name}</span>
+                  </div>
+                  <span className="marc leader-row__val">{row[category]}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
-    </>
+          )}
+        </section>
+      ))}
+    </div>
   )
 }

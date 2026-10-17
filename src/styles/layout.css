@@ -1141,6 +1141,12 @@ summary.results-group__title::before {
 .seg__btn.is-active { background: var(--color-superficie); color: var(--color-premier); box-shadow: var(--shadow-sm); }
 
 /* ── Lista de líderes ───────────────────────────────────────────── */
+.leaders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 24px;
+}
+.leaders__title { font-size: 20px; margin-bottom: 10px; }
 .leaders {
   background: var(--color-superficie);
   border: 1px solid var(--color-borde);
