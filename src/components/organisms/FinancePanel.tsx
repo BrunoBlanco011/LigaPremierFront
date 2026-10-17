@@ -1,10 +1,11 @@
-import { useState } from 'react'
-import { Plus, CircleDollarSign } from 'lucide-react'
-import type { FinanceMovementType } from '@/types/api'
-import { useFinanceSummary } from '@/features/finance/queries'
+import { Fragment, useMemo, useState } from 'react'
+import { ChevronDown, ChevronRight, Plus, CircleDollarSign, Trash2 } from 'lucide-react'
+import type { FinanceMovement, FinanceMovementType } from '@/types/api'
+import { useFinanceMovements, useFinanceSummary } from '@/features/finance/queries'
 import {
   useChargeRegistration,
   useCreateMovement,
+  useDeleteMovement,
 } from '@/features/finance/mutations'
 import { useTournamentTeams } from '@/features/teams/queries'
 import { MoneyText } from '@/components/molecules/MoneyText'
@@ -14,13 +15,14 @@ import { FormField } from '@/components/molecules/FormField'
 import { Label } from '@/components/atoms/Label'
 import { Select } from '@/components/atoms/Select'
 import { Button } from '@/components/atoms/Button'
+import { useConfirmMutate } from '@/components/molecules/ConfirmDialog'
 import {
   EmptyState,
   ErrorState,
   LoadingState,
 } from '@/components/molecules/StateView'
 import { friendlyMessage } from '@/lib/errors'
-import { formatMoney } from '@/lib/format'
+import { formatDateShort, formatMoney } from '@/lib/format'
 
 const MOVEMENT_TYPES: { value: FinanceMovementType; label: string }[] = [
   { value: 'payment', label: 'Abono' },
@@ -28,6 +30,9 @@ const MOVEMENT_TYPES: { value: FinanceMovementType; label: string }[] = [
   { value: 'other_charge', label: 'Otro cargo' },
   { value: 'registration_fee', label: 'Inscripción' },
 ]
+const TYPE_LABEL = Object.fromEntries(MOVEMENT_TYPES.map((t) => [t.value, t.label])) as Record<FinanceMovementType, string>
+
+const EMPTY_MOVEMENT = { team_id: '', type: 'payment' as FinanceMovementType, amount: '', description: '' }
 
 /** Estado de cuenta + movimientos del torneo (RF-29/30/31). */
 export function FinancePanel({ tournamentId }: { tournamentId: string }) {
@@ -35,12 +40,38 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
   const teams = useTournamentTeams(tournamentId)
   const charge = useChargeRegistration(tournamentId)
   const create = useCreateMovement(tournamentId)
+  const movements = useFinanceMovements(tournamentId)
+  const remove = useDeleteMovement(tournamentId)
+  const confirmMutate = useConfirmMutate()
 
   const [regOpen, setRegOpen] = useState(false)
   const [regAmount, setRegAmount] = useState('')
   const [movOpen, setMovOpen] = useState(false)
-  const [mov, setMov] = useState({ team_id: '', type: 'payment' as FinanceMovementType, amount: '', description: '' })
+  const [mov, setMov] = useState(EMPTY_MOVEMENT)
   const [error, setError] = useState<string | null>(null)
+  const [expanded, setExpanded] = useState<Set<string>>(new Set())
+
+  // Movimientos de cada equipo, del más reciente al más antiguo
+  const movementsByTeam = useMemo(() => {
+    const map = new Map<string, FinanceMovement[]>()
+    for (const m of movements.data ?? []) map.set(m.team_id, [...(map.get(m.team_id) ?? []), m])
+    for (const list of map.values()) list.sort((a, b) => b.occurred_on.localeCompare(a.occurred_on))
+    return map
+  }, [movements.data])
+
+  const toggle = (teamId: string) =>
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      if (next.has(teamId)) next.delete(teamId)
+      else next.add(teamId)
+      return next
+    })
+
+  const openMovement = (teamId = '') => {
+    setError(null)
+    setMov({ ...EMPTY_MOVEMENT, team_id: teamId })
+    setMovOpen(true)
+  }
 
   const submitRegistration = () => {
     setError(null)
@@ -62,7 +93,7 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
         description: mov.description.trim() || null,
       },
       {
-        onSuccess: () => { setMovOpen(false); setMov({ team_id: '', type: 'payment', amount: '', description: '' }) },
+        onSuccess: () => { setMovOpen(false); setMov(EMPTY_MOVEMENT) },
         onError: (e) => setError(friendlyMessage(e)),
       },
     )
@@ -78,7 +109,7 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
           <Button variant="outline" onClick={() => setRegOpen(true)}>
             <CircleDollarSign size={16} /> Cargar inscripción
           </Button>
-          <Button variant="primary" onClick={() => setMovOpen(true)}>
+          <Button variant="primary" onClick={() => openMovement()}>
             <Plus size={16} /> Movimiento
           </Button>
         </div>
@@ -91,24 +122,7 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
       ) : !summary.data || summary.data.teams.length === 0 ? (
         <EmptyState title="Sin datos financieros" message="Carga la inscripción para empezar." />
       ) : (
-        <>
-          <div className="fin-totals">
-            <div className="card stat-card">
-              <div className="stat-card__num">{formatMoney(summary.data.total_charges)}</div>
-              <div className="stat-card__label">Total de cargos</div>
-            </div>
-            <div className="card stat-card">
-              <div className="stat-card__num">{formatMoney(summary.data.total_payments)}</div>
-              <div className="stat-card__label">Total de abonos</div>
-            </div>
-            <div className="card stat-card">
-              <div className="stat-card__num">
-                <MoneyText amount={summary.data.total_balance} balance />
-              </div>
-              <div className="stat-card__label">Adeudo total</div>
-            </div>
-          </div>
-          <div className="table-wrap">
+        <div className="table-wrap">
           <table className="table tnum">
             <thead>
               <tr>
@@ -124,30 +138,94 @@ export function FinancePanel({ tournamentId }: { tournamentId: string }) {
             <tbody>
               {[...summary.data.teams]
                 .sort((a, b) => Number(b.balance) - Number(a.balance))
-                .map((r) => (
-                <tr key={r.team.id}>
-                  <td><TeamBadge name={r.team.name} logoUrl={r.team.logo_url} /></td>
-                  <td className="num"><MoneyText amount={r.registration_fees} /></td>
-                  <td className="num"><MoneyText amount={r.fines} /></td>
-                  <td className="num"><MoneyText amount={r.other_charges} /></td>
-                  <td className="num"><MoneyText amount={r.total_charges} /></td>
-                  <td className="num"><MoneyText amount={r.payments} /></td>
-                  <td className="num"><MoneyText amount={r.balance} balance /></td>
-                </tr>
-              ))}
+                .map((r) => {
+                  const open = expanded.has(r.team.id)
+                  const list = movementsByTeam.get(r.team.id) ?? []
+                  return (
+                    <Fragment key={r.team.id}>
+                      <tr>
+                        <td>
+                          <button
+                            type="button"
+                            className="fin-toggle"
+                            aria-expanded={open}
+                            aria-controls={`fin-mov-${r.team.id}`}
+                            onClick={() => toggle(r.team.id)}
+                          >
+                            {open ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                            <TeamBadge name={r.team.name} logoUrl={r.team.logo_url} />
+                          </button>
+                        </td>
+                        <td className="num"><MoneyText amount={r.registration_fees} /></td>
+                        <td className="num"><MoneyText amount={r.fines} /></td>
+                        <td className="num"><MoneyText amount={r.other_charges} /></td>
+                        <td className="num"><MoneyText amount={r.total_charges} /></td>
+                        <td className="num"><MoneyText amount={r.payments} /></td>
+                        <td className="num"><MoneyText amount={r.balance} balance /></td>
+                      </tr>
+                      {open && (
+                        <tr id={`fin-mov-${r.team.id}`} className="fin-detail">
+                          <td colSpan={7}>
+                            <div className="fin-detail__head">
+                              <strong>Movimientos de {r.team.name}</strong>
+                              <Button variant="outline" onClick={() => openMovement(r.team.id)}>
+                                <Plus size={16} /> Movimiento
+                              </Button>
+                            </div>
+                            {movements.isLoading ? (
+                              <LoadingState />
+                            ) : list.length === 0 ? (
+                              <p className="fin-detail__empty">Sin movimientos registrados.</p>
+                            ) : (
+                              <table className="table tnum fin-detail__table">
+                                <thead>
+                                  <tr>
+                                    <th>Fecha</th>
+                                    <th>Tipo</th>
+                                    <th>Descripción</th>
+                                    <th className="num">Monto</th>
+                                    <th aria-label="Acciones" />
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {list.map((m) => (
+                                    <tr key={m.id}>
+                                      <td>{formatDateShort(m.occurred_on)}</td>
+                                      <td>{TYPE_LABEL[m.type]}</td>
+                                      <td>{m.description ?? '—'}</td>
+                                      <td className="num">
+                                        {m.type === 'payment' ? '− ' : ''}
+                                        <MoneyText amount={m.amount} />
+                                      </td>
+                                      <td className="num">
+                                        <Button
+                                          variant="ghost"
+                                          aria-label={`Eliminar ${TYPE_LABEL[m.type].toLowerCase()} de ${formatMoney(m.amount)}`}
+                                          onClick={() =>
+                                            confirmMutate(
+                                              `¿Eliminar este movimiento?\n\n${TYPE_LABEL[m.type]} de ${formatMoney(m.amount)} a ${r.team.name}.`,
+                                              remove,
+                                              m.id,
+                                            )
+                                          }
+                                        >
+                                          <Trash2 size={16} />
+                                        </Button>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            )}
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  )
+                })}
             </tbody>
-            <tfoot>
-              <tr style={{ fontWeight: 700 }}>
-                <td>Totales</td>
-                <td colSpan={3} />
-                <td className="num"><MoneyText amount={summary.data.total_charges} /></td>
-                <td className="num"><MoneyText amount={summary.data.total_payments} /></td>
-                <td className="num"><MoneyText amount={summary.data.total_balance} balance /></td>
-              </tr>
-            </tfoot>
           </table>
-          </div>
-        </>
+        </div>
       )}
 
       {/* Cargar inscripción (RF-30) */}

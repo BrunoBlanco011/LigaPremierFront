@@ -1228,8 +1228,22 @@ summary.results-group__title::before {
 .filters > * { min-width: 160px; flex: 0 1 220px; }
 
 /* Tarjetas de totales de finanzas */
-.fin-totals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-@media (max-width: 640px) { .fin-totals { grid-template-columns: 1fr; } }
+.fin-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.fin-detail > td { background: var(--color-fondo); padding: 12px 16px 16px; }
+.fin-detail__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.fin-detail__empty { color: var(--color-texto-2); font-size: 14px; margin: 0; }
+.fin-detail__table { background: var(--color-superficie); }
 
 /* Tarjetas de totales del perfil de jugador: 3×2 escritorio, 2×3 móvil */
 .player-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
