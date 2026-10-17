@@ -42,7 +42,7 @@ export function TournamentPage() {
     { to: `${base}/rol`, label: 'Rol de juegos' },
     { to: `${base}/resultados`, label: 'Resultados' },
     { to: `${base}/equipos`, label: 'Equipos' },
-    { to: `${base}/estadisticas`, label: 'Estadísticas' },
+    { to: `${base}/estadisticas`, label: 'MVP' },
   ]
 
   if (tournament.isLoading) {

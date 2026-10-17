@@ -19,18 +19,25 @@ export const LEADER_LABELS: Record<LeaderSort, string> = {
   games_attended: 'Asistencia',
 }
 
-export function useLeaders(
-  tournamentId: string,
-  sortBy: LeaderSort,
-  limit = 10,
-) {
+/** Acumulado de todos los jugadores del torneo (para armar los líderes de cada categoría). */
+export function useTournamentPlayerStats(tournamentId: string) {
   return useQuery({
-    queryKey: ['tournaments', tournamentId, 'leaders', sortBy, limit],
+    queryKey: ['tournaments', tournamentId, 'player-stats'],
+    queryFn: () =>
+      api.get<PlayerTotals[]>(`/tournaments/${tournamentId}/player-stats`),
+    enabled: Boolean(tournamentId),
+  })
+}
+
+/** Acumulado del torneo de cada jugador de un equipo (inscripción). */
+export function useTeamPlayerStats(tournamentId: string, teamId: string) {
+  return useQuery({
+    queryKey: ['tournaments', tournamentId, 'player-stats', teamId],
     queryFn: () =>
       api.get<PlayerTotals[]>(
         `/tournaments/${tournamentId}/player-stats`,
-        { query: { sort_by: sortBy, limit } },
+        { query: { team_id: teamId } },
       ),
-    enabled: Boolean(tournamentId),
+    enabled: Boolean(tournamentId && teamId),
   })
 }
